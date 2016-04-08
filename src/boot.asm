@@ -25,12 +25,12 @@ stack_top:
 ; bootstrap
 section .text:
 global _start
-extern _kmain
+extern kmain
 
 _start:
     mov esp, stack_top
 
-    call _kmain
+    call kmain
 
 ; wither into oblivion
     cli
