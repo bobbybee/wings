@@ -25,47 +25,15 @@ stack_top:
 ; bootstrap
 section .text:
 global _start
+extern _kmain
 
 _start:
     mov esp, stack_top
 
-kmain:
-    mov al, 'A'
-    call vgaPutchar    
-    call vgaPutchar    
-    call vgaPutchar    
-    call vgaPutchar    
-    call vgaPutchar    
-    call vgaPutchar    
-    call vgaPutchar    
-    call vgaPutchar    
-    call vgaPutchar    
-    call vgaPutchar    
+    call _kmain
 
-    ; wither into oblivion
+; wither into oblivion
     cli
 .hang:
     hlt
     jmp .hang
-
-; 0xB8000 display driver
-
-vgaPutchar:
-    mov bl, al
-    mov bh, 0x2A
-    
-    ; ((cursorY * 80) + (cursorX)) * 2
-    mov eax, [cursorY]
-    shl eax, 2
-    add eax, [cursorY]
-    shl eax, 4
-    add eax, [cursorX]
-    shl eax, 1
-    add eax, 0xB8000
-
-    mov word [eax], bx
-    ret
-
-section .data:
-    cursorX dw 0
-    cursorY dw 0
