@@ -10,12 +10,10 @@ typedef signed int     ssize_t;
 
 inline void kputchar(char);
 inline void kmemcpy(void* dst, void* src, ssize_t length);
+inline void kputs(char* str);
 
 void kmain() {
-    for(int i = 0; i < 2000; ++i) {
-        kputchar('A' + (i % 26));
-    }
-
+    kputs("Hello, World!\n");
     for(;;);
 }
 
@@ -32,7 +30,7 @@ inline void kputchar(char a) {
         cursorX--;
     } else {
         int offset = (cursorY * 80) + cursorX;
-        *(VGABaseAddress + offset) = (0x2A << 8) | a;
+        *(VGABaseAddress + offset) = (0x02 << 8) | a;
 
         cursorX++;
 
@@ -46,6 +44,10 @@ inline void kputchar(char a) {
         kmemcpy(VGABaseAddress, VGABaseAddress + 80, (80 * 2 * (24 - 1)));
         cursorY--;
     }
+}
+
+inline void kputs(char* str) {
+    while(*str != 0) kputchar(*(str++));
 }
 
 inline void kmemcpy(void* dst, void* src, ssize_t length) {
