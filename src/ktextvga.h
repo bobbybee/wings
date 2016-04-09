@@ -3,7 +3,7 @@
 
 #include <kstandard.h>
 
-inline void kputchar(char);
-inline void kputs(char* str);
+void kputchar(char);
+void kputs(char* str);
 
 #endif

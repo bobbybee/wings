@@ -1,3 +1,6 @@
+#include <ktextvga.h>
+#include <kmemory.h>
+
 uint16_t* VGABaseAddress = (uint16_t*) 0xB8000;
 int cursorX = 0, cursorY = 0;
 
