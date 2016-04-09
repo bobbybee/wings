@@ -46,7 +46,6 @@ loadGDT:
     cli
 
     ; load GDT structure
-
     mov eax, [esp + 4]
     lgdt [eax]
     
@@ -58,7 +57,5 @@ codesegment:
     mov fs, ax
     mov gs, ax
     mov ss, ax
-
-    sti
 
     ret
