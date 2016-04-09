@@ -12,7 +12,6 @@ void initGDT() {
     gdtEntry(&gdtTable, 1, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_RING0 | GDT_RW | GDT_EXECUTABLE, GDT_SIZE);
     gdtEntry(&gdtTable, 2, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_RING0 | GDT_RW, GDT_SIZE);
 
-
     struct descriptorPtr ptr;
     ptr.limit = sizeof(gdtTable) - 1;
     ptr.offset = &gdtTable;
@@ -21,11 +20,6 @@ void initGDT() {
 
     kputs("GDT loaded\n");
 }
-
-void initIDT() {
-
-}
-
 
 void gdtEntry(
         void* table,

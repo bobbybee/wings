@@ -2,11 +2,9 @@
 #define __KGDT_H
 
 #include <kstandard.h>
-
-extern void loadGDT(void* descriptor);  
+#include <kdescriptor.h>
 
 void initGDT();
-void initIDT();
 
 void gdtEntry(void* table, int number, void* base, uint32_t limit, uint8_t access, uint8_t flags);
 
@@ -23,11 +21,5 @@ void gdtEntry(void* table, int number, void* base, uint32_t limit, uint8_t acces
 
 #define GDT_GRANULARITY_PAGE (1<<3)
 #define GDT_SIZE (1<<2)
-
-
-struct descriptorPtr {
-    uint16_t limit;
-    void* offset;
-} __attribute__((packed));
 
 #endif
