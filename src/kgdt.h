@@ -1,6 +1,8 @@
 #ifndef __KGDT_H
 #define __KGDT_H
 
+#include <kstandard.h>
+
 extern void loadGDT(void* base, uint16_t limit);  
 extern void loadIDT(void* base, uint16_t limit);  
 

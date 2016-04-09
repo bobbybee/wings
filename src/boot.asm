@@ -37,3 +37,8 @@ _start:
 .hang:
     hlt
     jmp .hang
+
+; assistance code
+global loadGDT
+loadGDT:
+    ret
