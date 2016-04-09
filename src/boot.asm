@@ -60,6 +60,7 @@ codesegment:
     ret
 
 ; void loadIDT(void* descriptor)
+global loadIDT
 loadIDT:
     mov eax, [esp + 4]
     lidt [eax]
@@ -67,6 +68,7 @@ loadIDT:
 
 ; ISR stub macros
 %macro isr_code 1
+    global isr%1
     isr%1:
         cli
         push byte %1
@@ -74,6 +76,7 @@ loadIDT:
 %endmacro
 
 %macro isr_stub 1
+    global isr%1
     isr%1:
         cli
         push byte 42

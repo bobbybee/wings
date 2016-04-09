@@ -3,10 +3,12 @@
  */
 
 #include <kidt.h>
+#include <ktextvga.h>
 
-uint8_t idtTable[8 * 3];
+uint8_t idtTable[8 * 32];
 
 void initIDT() {
+    kputs("Initializing idt..\n");
     idtEntry(&idtTable, 0, isr0, 0x8, IDT_GATE_PRESENT | IDT_GATE_TRAP | IDT_MIN_RING0);
     idtEntry(&idtTable, 0, isr1, 0x8, IDT_GATE_PRESENT | IDT_GATE_TRAP | IDT_MIN_RING0);
     idtEntry(&idtTable, 0, isr2, 0x8, IDT_GATE_PRESENT | IDT_GATE_TRAP | IDT_MIN_RING0);
@@ -39,6 +41,13 @@ void initIDT() {
     idtEntry(&idtTable, 0, isr29, 0x8, IDT_GATE_PRESENT | IDT_GATE_TRAP | IDT_MIN_RING0);
     idtEntry(&idtTable, 0, isr30, 0x8, IDT_GATE_PRESENT | IDT_GATE_TRAP | IDT_MIN_RING0);
     idtEntry(&idtTable, 0, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_TRAP | IDT_MIN_RING0);
+    
+    struct descriptorPtr ptr;
+    ptr.limit = sizeof(idtTable) - 1;
+    ptr.offset = &idtTable;
+    loadIDT(&ptr);
+
+    kputs("Initialized\n");
 }
 
 void idtEntry(
