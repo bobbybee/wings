@@ -18,7 +18,7 @@ void gdtEntry(void* table, int number, void* base, uint32_t limit, uint8_t acces
 #define GDT_RING2 (1<<6)
 #define GDT_RING3 (1<<5 | 1<<6)
 
-#define GDT_EXECUTABLE (1<3)
+#define GDT_EXECUTABLE (1<<3)
 #define GDT_DC (1<<2)
 #define GDT_RW (1<<1)
 

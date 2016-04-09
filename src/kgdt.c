@@ -8,11 +8,11 @@
 uint8_t gdtTable[8 * 3];
 
 void initGDT() {
-    gdtEntry(gdtTable, 0, 0, 0, GDT_PRESENT | GDT_RING0, GDT_SIZE);
-    gdtEntry(gdtTable, 1, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_RING0 | GDT_EXECUTABLE, GDT_SIZE);
-    gdtEntry(gdtTable, 2, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_RING0, GDT_SIZE);
+    gdtEntry(gdtTable, 0, 0, 0, 0, GDT_SIZE);
+    gdtEntry(gdtTable, 1, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_RING0 | GDT_RW | GDT_EXECUTABLE, GDT_SIZE);
+    gdtEntry(gdtTable, 2, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_RING0 | GDT_RW, GDT_SIZE);
     
-//    loadGDT(&gdtTable, sizeof(gdtTable));
+    loadGDT(gdtTable, sizeof(gdtTable));
 }
 
 void initIDT() {
