@@ -40,7 +40,7 @@ _start:
 
 ; assistance code
 
-; void loadGDT(void* base, uint16_t limit)
+; void loadGDT(void* descriptor)
 global loadGDT
 loadGDT:
     cli
@@ -48,13 +48,8 @@ loadGDT:
     ; load GDT structure
 
     mov eax, [esp + 4]
-    mov [gdtTable + 2], eax
-
-    mov ax, [esp + 8]
-    mov [gdtTable], ax
-
-    lgdt [gdtTable]
-
+    lgdt [eax]
+    
     jmp 0x08:codesegment
 codesegment:
     mov ax, 0x10
@@ -67,9 +62,3 @@ codesegment:
     sti
 
     ret
-
-section .data:
-align 4
-
-gdtTable dw 0
-         dd 0

@@ -8,11 +8,18 @@
 uint8_t gdtTable[8 * 3];
 
 void initGDT() {
-    gdtEntry(gdtTable, 0, 0, 0, 0, GDT_SIZE);
-    gdtEntry(gdtTable, 1, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_RING0 | GDT_RW | GDT_EXECUTABLE, GDT_SIZE);
-    gdtEntry(gdtTable, 2, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_RING0 | GDT_RW, GDT_SIZE);
-    
-    loadGDT(&gdtTable, sizeof(gdtTable));
+    gdtEntry(&gdtTable, 0, 0, 0, 0, GDT_SIZE);
+    gdtEntry(&gdtTable, 1, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_RING0 | GDT_RW | GDT_EXECUTABLE, GDT_SIZE);
+    gdtEntry(&gdtTable, 2, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_RING0 | GDT_RW, GDT_SIZE);
+
+
+    struct descriptorPtr ptr;
+    ptr.limit = sizeof(gdtTable) - 1;
+    ptr.offset = &gdtTable;
+
+    loadGDT(&ptr);
+
+    kputs("GDT loaded\n");
 }
 
 void initIDT() {
@@ -42,7 +49,7 @@ void gdtEntry(
     entry[3] = (_base & 0x0000FF00) >> 8;
     entry[4] = (_base & 0x00FF0000) >> 16;
     entry[5] = access;
-    entry[6] = ((limit & 0x00F0000) >> 16) | ((flags & 0x0F) << 4);
+    entry[6] = ((limit >> 16) & 0xF) | ((flags & 0x0F) << 4);
     entry[7] = (_base & 0xFF000000) >> 24;
 
     kputs("GDT Entry: ");
