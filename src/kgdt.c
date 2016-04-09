@@ -12,7 +12,7 @@ void initGDT() {
     gdtEntry(gdtTable, 1, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_RING0 | GDT_RW | GDT_EXECUTABLE, GDT_SIZE);
     gdtEntry(gdtTable, 2, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_RING0 | GDT_RW, GDT_SIZE);
     
-    loadGDT(gdtTable, sizeof(gdtTable));
+    loadGDT(&gdtTable, sizeof(gdtTable));
 }
 
 void initIDT() {
