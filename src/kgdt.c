@@ -48,7 +48,7 @@ void gdtEntry(
     kputs("GDT Entry: ");
     kputnum(number, 10);
     kputs(", base: ");
-    kputnum(number, 16);
+    kputnum((uint32_t)base, 16);
     kputs(", limit: ");
     kputnum(limit, 16);
     kputs(", access: ");

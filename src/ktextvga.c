@@ -34,9 +34,35 @@ inline void kputs(char* str) {
     while(*str != 0) kputchar(*(str++));
 }
 
-void kputnum(int num, int base) {
-    kputs("[num]");
-    num++;
-    base++;
+inline char kputnumeral(int numeral, int base) {
+    if(base == 16 && numeral > 9) {
+        return 'A' + numeral - 10;
+    }
 
+    return '0' + numeral;
+}
+
+void kputnum(int num, int base) {
+    // handle special cases
+
+    if(num == 0) {
+        kputchar('0');
+        return;
+    }
+
+    if(num < 0) {
+        kputchar('-');
+        num *= -1;
+    }
+
+    char buffer[32];
+    int index = 0;
+
+    while(num > 0 && index < 32) {
+        buffer[index++] = kputnumeral(num % base, base);
+        num /= base;
+    }
+
+    // print in reverse for the actual numeral
+    while(index--) kputchar(buffer[index]);
 }
