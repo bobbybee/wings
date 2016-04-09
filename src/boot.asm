@@ -39,6 +39,26 @@ _start:
     jmp .hang
 
 ; assistance code
+
+; void loadGDT(void* base, uint16_t limit)
 global loadGDT
 loadGDT:
+    ; load GDT structure
+
+    mov eax, [esp + 4]
+    mov [gdtTable + 2], eax
+
+    mov ax, [esp + 8]
+    mov [gdtTable], ax
+
+    cli
+    lgdt [gdtTable]
+    sti
+
     ret
+
+section .data:
+align 4
+
+gdtTable dw 0
+         dd 0

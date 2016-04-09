@@ -33,3 +33,10 @@ inline void kputchar(char a) {
 inline void kputs(char* str) {
     while(*str != 0) kputchar(*(str++));
 }
+
+void kputnum(int num, int base) {
+    kputs("[num]");
+    num++;
+    base++;
+
+}

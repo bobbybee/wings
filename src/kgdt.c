@@ -3,6 +3,7 @@
  */
 
 #include <kgdt.h>
+#include <ktextvga.h>
 
 uint8_t gdtTable[8 * 3];
 
@@ -11,7 +12,7 @@ void initGDT() {
     gdtEntry(gdtTable, 1, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_RING0 | GDT_EXECUTABLE, GDT_SIZE);
     gdtEntry(gdtTable, 2, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_RING0, GDT_SIZE);
     
-    loadGDT(&gdtTable, sizeof(gdtTable));
+//    loadGDT(&gdtTable, sizeof(gdtTable));
 }
 
 void initIDT() {
@@ -43,4 +44,16 @@ void gdtEntry(
     entry[5] = access;
     entry[6] = ((limit & 0x00F0000) >> 16) | ((flags & 0x0F) << 4);
     entry[7] = (_base & 0xFF000000) >> 24;
+
+    kputs("GDT Entry: ");
+    kputnum(number, 10);
+    kputs(", base: ");
+    kputnum(number, 16);
+    kputs(", limit: ");
+    kputnum(limit, 16);
+    kputs(", access: ");
+    kputnum(access, 16);
+    kputs(", flags: ");
+    kputnum(flags, 16);
+    kputchar('\n');
 }
