@@ -38,7 +38,6 @@ _start:
     hlt
     jmp .hang
 
-; assistance code
 
 ; void loadGDT(void* descriptor)
 global loadGDT
@@ -59,3 +58,9 @@ codesegment:
     mov ss, ax
 
     ret
+
+; void loadIDT(void* descriptor)
+loadIDT:
+    mov eax, [esp + 4]
+    lidt [eax]
+    return
