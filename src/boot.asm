@@ -65,11 +65,6 @@ loadIDT:
     mov eax, [esp + 4]
     lidt [eax]
 
-    ; shut up the PIC for a minute
-    mov al, 0xFF
-    out 0xA1, al
-    out 0x21, al
-
     sti
     ret
 
