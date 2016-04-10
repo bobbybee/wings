@@ -64,7 +64,7 @@ global loadIDT
 loadIDT:
     mov eax, [esp + 4]
     lidt [eax]
-    ;sti
+    sti
     ret
 
 ; ISR stub macros
