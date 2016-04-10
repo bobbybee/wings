@@ -8,10 +8,14 @@
 #include <kgdt.h>
 #include <kidt.h>
 
+void initPIC();
+
 void kmain() {
     kputs("Hello, World!\n");
     initGDT();
     initIDT();
+    initPIC();
+
     __asm__("int $0");
     __asm__("int $1");
     __asm__("int $2");

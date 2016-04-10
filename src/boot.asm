@@ -152,3 +152,64 @@ isrHandlerInterm:
 
     sti
     iret
+
+; PIC remapping code
+global initPIC
+
+initPIC:
+    push bx
+
+    ; save state
+    ; bh contains master pic state
+    ; bl contains slave pic state
+    in al, 0x21
+    mov bh, al
+    in al, 0xA1
+    mov bl, al
+
+
+    ; meta-initialize
+    mov al, 0x11
+    out 0x20, al
+    mov al, 0
+    out 0x80, al
+    mov al, 0x11
+    out 0xA0, al
+    mov al, 0x00
+    out 0x80, al
+
+    ; new offsets
+    mov al, 0x20
+    out 0x21, al
+    mov al, 0x00
+    out 0x80, al
+    mov al, 0x28
+    out 0xA1, al
+    mov al, 0x00
+    out 0x80, al
+
+    ; black magic from the osdev wiki
+    mov al, 0x04
+    out 0x21, al
+    mov al, 0x00
+    out 0x80, al
+    mov al, 0x02
+    out 0xA1, al
+    mov al, 0x00
+    out 0x80, al
+    mov al, 0x01
+    out 0x21, al
+    mov al, 0x00
+    out 0x80, al
+    mov al, 0x01
+    out 0xA1, al
+    mov al, 0x00
+    out 0x80, al
+
+    ; restore state
+    out 0xA1, al
+    mov al, ah
+    out 0x21, al
+    
+    pop bx
+    ret
