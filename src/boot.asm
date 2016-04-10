@@ -149,6 +149,14 @@ isrHandlerInterm:
     sti
     iret
 
+; IRQ handlers
+
+global irq0
+irq0:
+    cli
+    push 0
+    jmp isrHandlerInterm
+
 ; PIC remapping code
 global initPIC
 

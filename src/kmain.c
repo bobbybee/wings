@@ -21,11 +21,5 @@ void kmain() {
     maskPIC(0xFD, 0xFF);
     __asm__("sti");
 
-    __asm__("int $0");
-    __asm__("int $1");
-    __asm__("int $2");
-    __asm__("int $3");
-    __asm__("int $4");
-    __asm__("int $5");
     for(;;);
 }

@@ -39,6 +39,8 @@ extern void isr29();
 extern void isr30();
 extern void isr31();
 
+extern void irq0();
+
 #define IDT_GATE_INTERRUPT (0x6)
 #define IDT_GATE_TRAP (0xF)
 #define IDT_GATE_TASK (0x5)
