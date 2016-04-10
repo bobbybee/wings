@@ -5,7 +5,7 @@
 #include <kidt.h>
 #include <ktextvga.h>
 
-uint16_t idtTable[4 * 33];
+uint16_t idtTable[4 * 46];
 
 void idtEntry(uint16_t* table, int number, void* offset, uint16_t selector, uint8_t flags);
 
@@ -44,8 +44,22 @@ void initIDT() {
     idtEntry(idtTable, 30, isr30, 0x8, IDT_GATE_PRESENT | IDT_GATE_TRAP | IDT_MIN_RING0);
     idtEntry(idtTable, 31, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_TRAP | IDT_MIN_RING0);
 
-    idtEntry(idtTable, 32, irq0, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
-   
+    idtEntry(idtTable, 32, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
+    idtEntry(idtTable, 33, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
+    idtEntry(idtTable, 34, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
+    idtEntry(idtTable, 35, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
+    idtEntry(idtTable, 36, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
+    idtEntry(idtTable, 37, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
+    idtEntry(idtTable, 38, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
+    idtEntry(idtTable, 39, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
+
+    idtEntry(idtTable, 40, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
+    idtEntry(idtTable, 41, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
+    idtEntry(idtTable, 42, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
+    idtEntry(idtTable, 43, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
+    idtEntry(idtTable, 44, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
+    idtEntry(idtTable, 45, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
+
     struct descriptorPtr ptr;
     ptr.limit = sizeof(idtTable) - 1;
     ptr.offset = &idtTable;

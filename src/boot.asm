@@ -19,7 +19,7 @@ section .bootstack:
 align 4
 
 stack_bottom:
-resb 16384
+times 16384 db 0
 stack_top:
 
 ; bootstrap
