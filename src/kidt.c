@@ -10,9 +10,8 @@ uint16_t idtTable[4 * 45];
 void idtEntry(uint16_t* table, int number, void* offset, uint16_t selector, uint8_t flags);
 
 void initIDT() {
-    int hello;
+    int hello = 2;
     kputs("Initializing idt..\n");
-    kputnum(sizeof(idtTable), 10);
     idtEntry(idtTable, 0, isr0, 0x8, IDT_GATE_PRESENT | IDT_GATE_TRAP | IDT_MIN_RING0);
     idtEntry(idtTable, 1, isr1, 0x8, IDT_GATE_PRESENT | IDT_GATE_TRAP | IDT_MIN_RING0);
     idtEntry(idtTable, 2, isr2, 0x8, IDT_GATE_PRESENT | IDT_GATE_TRAP | IDT_MIN_RING0);
