@@ -78,7 +78,7 @@ loadIDT:
     global isr%1
     isr%1:
         cli
-        push byte %1
+        push %1
         jmp isrHandlerInterm
 %endmacro
 
@@ -86,8 +86,8 @@ loadIDT:
     global isr%1
     isr%1:
         cli
-        push byte 42
-        push byte %1
+        push 42
+        push %1
         jmp isrHandlerInterm
 %endmacro
 
@@ -139,7 +139,8 @@ isrHandlerInterm:
     mov fs, ax
     mov gs, ax
 
-    push 42
+    mov eax, [esp + 34]
+    push eax
     call isrHandler
     add esp, 4
 
