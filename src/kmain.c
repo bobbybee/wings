@@ -12,9 +12,12 @@ void initPIC();
 
 void kmain() {
     kputs("Hello, World!\n");
+
+    __asm__("cli");
     initGDT();
     initIDT();
     initPIC();
+    __asm__("sti");
 
     __asm__("int $0");
     __asm__("int $1");

@@ -42,8 +42,6 @@ _start:
 ; void loadGDT(void* descriptor)
 global loadGDT
 loadGDT:
-    cli
-
     ; load GDT structure
     mov eax, [esp + 4]
     lgdt [eax]
@@ -64,8 +62,6 @@ global loadIDT
 loadIDT:
     mov eax, [esp + 4]
     lidt [eax]
-
-    sti
     ret
 
 ; ISR stub macros
