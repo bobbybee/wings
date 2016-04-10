@@ -64,7 +64,7 @@ global loadIDT
 loadIDT:
     mov eax, [esp + 4]
     lidt [eax]
-    sti
+    ;sti
     ret
 
 ; ISR stub macros
@@ -74,7 +74,7 @@ loadIDT:
         ;cli
         ;push dword %1
         ;jmp isrHandlerInterm
-        iret
+        hlt 
 %endmacro
 
 %macro isr_stub 1
@@ -84,7 +84,7 @@ loadIDT:
         ;push dword 0xDEADBEEF
         ;push dword %1
         ;jmp isrHandlerInterm
-        iret
+        hlt
 %endmacro
 
 ; exception stubs

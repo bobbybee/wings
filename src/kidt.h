@@ -5,7 +5,6 @@
 #include <kdescriptor.h>
 
 void initIDT();
-void idtEntry(void* table, int number, void* offset, uint16_t selector, uint8_t flags);
 
 extern void isr0();
 extern void isr1();
