@@ -136,8 +136,10 @@ isrHandlerInterm:
 
     mov eax, [esp + 34]
     push eax
+    mov eax, [esp + 42]
+    push eax
     call isrHandler
-    add esp, 4
+    add esp, 8
 
     pop ax
     mov ds, ax
