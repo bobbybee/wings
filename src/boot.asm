@@ -64,6 +64,12 @@ global loadIDT
 loadIDT:
     mov eax, [esp + 4]
     lidt [eax]
+
+    ; shut up the PIC for a minute
+    mov al, 0xFF
+    out 0xA1, al
+    out 0x21, al
+
     sti
     ret
 
@@ -72,7 +78,7 @@ loadIDT:
     global isr%1
     isr%1:
         cli
-        push dword %1
+        push byte %1
         jmp isrHandlerInterm
 %endmacro
 
@@ -80,8 +86,8 @@ loadIDT:
     global isr%1
     isr%1:
         cli
-        push dword 0xDEADBEEF
-        push dword %1
+        push byte 42
+        push byte %1
         jmp isrHandlerInterm
 %endmacro
 
@@ -133,7 +139,7 @@ isrHandlerInterm:
     mov fs, ax
     mov gs, ax
 
-    push byte 42
+    push 42
     call isrHandler
     add esp, 4
 
