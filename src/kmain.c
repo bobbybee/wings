@@ -11,7 +11,7 @@
 void kmain() {
     kputs("Hello, World!\n");
     initGDT();
-    //initIDT();
+    initIDT();
     //__asm__("int $6");
     for(;;);
 }

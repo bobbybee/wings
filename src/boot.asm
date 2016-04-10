@@ -71,18 +71,20 @@ loadIDT:
 %macro isr_code 1
     global isr%1
     isr%1:
-        cli
-        push byte %1
-        jmp isrHandlerInterm
+        ;cli
+        ;push dword %1
+        ;jmp isrHandlerInterm
+        iret
 %endmacro
 
 %macro isr_stub 1
     global isr%1
     isr%1:
-        cli
-        push byte 42
-        push byte %1
-        jmp isrHandlerInterm
+        ;cli
+        ;push dword 0xDEADBEEF
+        ;push dword %1
+        ;jmp isrHandlerInterm
+        iret
 %endmacro
 
 ; exception stubs
@@ -120,28 +122,32 @@ isr_stub 30
 isr_stub 31
 
 ; general handler
-extern isrHandler
-isrHandlerInterm:
-   pusha
+;extern isrHandler
+;isrHandlerInterm:
+;   pusha
+;
+;   mov ax, ds
+;   push ax
+;
+;   mov ax, 0x10
+;   mov ds, ax
+;   mov es, ax
+;   mov fs, ax
+;   mov gs, ax
+;
+;   call isrHandler
 
-   mov ax, ds
-   push ax
+;   pop ax
+;   mov ds, ax
+;   mov es, ax
+;   mov fs, ax
+;   mov gs, ax
 
-   mov ax, 0x10
-   mov ds, ax
-   mov es, ax
-   mov fs, ax
-   mov gs, ax
+;   popa
+;   add esp, 8
+;   sti
+;   iret
 
-   call isrHandler
-
-   pop ax
-   mov ds, ax
-   mov es, ax
-   mov fs, ax
-   mov gs, ax
-
-   popa
-   add esp, 8
-   sti
-   iret
+;isrHandlerInterm:
+;    add esp, 8 ; clean up
+;    iret
