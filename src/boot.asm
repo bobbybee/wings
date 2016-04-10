@@ -209,3 +209,14 @@ initPIC:
     
     pop bx
     ret
+
+global maskPIC
+; void maskPIC(int maskMaster, int maskSlave)
+; passes full words for my sanity -- besides, this should only be called once
+
+maskPIC:
+    mov eax, [esp + 4]
+    out 0x21, eax
+    mov eax, [esp + 8]
+    out 0xA1, eax
+    ret

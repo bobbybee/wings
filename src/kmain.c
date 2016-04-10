@@ -9,6 +9,7 @@
 #include <kidt.h>
 
 void initPIC();
+void maskPIC(int master, int slave);
 
 void kmain() {
     kputs("Hello, World!\n");
@@ -17,6 +18,7 @@ void kmain() {
     initGDT();
     initIDT();
     initPIC();
+    maskPIC(0xFD, 0xFF);
     __asm__("sti");
 
     __asm__("int $0");
