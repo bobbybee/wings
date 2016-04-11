@@ -151,11 +151,61 @@ isrHandlerInterm:
 
 ; IRQ handlers
 
-global irq0
-irq0:
-    cli
-    push 0
-    jmp isrHandlerInterm
+%macro irq 1
+    global irq%1
+    irq%1:
+        cli
+        push %1
+        jmp irqHandlerInterm
+%endmacro
+
+irq 0
+irq 1
+irq 2
+irq 3
+irq 4
+irq 5
+irq 6
+irq 7
+irq 8
+irq 9
+irq 10
+irq 11
+irq 12
+irq 13
+irq 14
+irq 15
+
+extern irqHandler
+irqHandlerInterm:
+    pusha
+
+    mov ax, ds
+    push ax
+
+    mov ax, 0x10
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+
+    mov eax, [esp + 34]
+    push eax
+    call irqHandler
+    add esp, 4
+
+    pop ax
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+
+    popa
+    add esp, 8
+
+    sti
+    iret
+
 
 ; PIC remapping code
 global initPIC

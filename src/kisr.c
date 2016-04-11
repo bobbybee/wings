@@ -9,3 +9,10 @@ void isrHandler(uint32_t offset, uint32_t number) {
     kputnum(offset, 16);
     kputchar('\n');
 }
+
+void irqHandler(uint32_t number) {
+    kputs("Received IRQ: ");
+    kputnum(number, 16);
+    kputchar('\n');
+}
+
