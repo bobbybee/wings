@@ -58,15 +58,15 @@ void initIDT() {
     idtEntry(41, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
     idtEntry(42, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
     idtEntry(43, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
-    idtEntry(44, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
+//    idtEntry(44, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
 //    idtEntry(45, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
 //    idtEntry(46, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
 //    idtEntry(47, isr31, 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
 
-    struct descriptorPtr ptr;
+    /*struct descriptorPtr ptr;
     ptr.limit = sizeof(idtTable) - 1;
     ptr.offset = &idtTable;
-    loadIDT(&ptr);
+    loadIDT(&ptr);*/
 
     kputs("Initialized\n");
 }
