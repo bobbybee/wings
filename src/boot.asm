@@ -218,7 +218,6 @@ initPIC:
     in al, 0xA1
     mov bl, al
 
-
     ; meta-initialize
     mov al, 0x11
     out 0x20, al
