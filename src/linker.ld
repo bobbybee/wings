@@ -1,7 +1,5 @@
 ENTRY(_start)
 OUTPUT_FORMAT(elf32-i386)
-STARTUP(bin/boot.o)
-OUTPUT(bin/kernel.elf)
 
 SECTIONS {
     . = 1M;
@@ -20,11 +18,7 @@ SECTIONS {
     }
 
     .bss BLOCK(4K) : ALIGN(4K) {
-        *(.COMMON)
         *(.bss)
-    }
-
-    .bootstrap_stack BLOCK(4K) : ALIGN(4K) {
-        *(.bootstrap_stack)
+        *(.stack)
     }
 }

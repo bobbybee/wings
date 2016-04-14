@@ -15,11 +15,11 @@ void kmain() {
     kputs("Hello, World!\n");
 
     __asm__("cli");
-    initGDT();
+//    initGDT();
     initIDT();
-    initPIC();
-    maskPIC(0xFD, 0xFF);
-    __asm__("sti");
+ //   initPIC();
+   // maskPIC(0xFD, 0xFF);
+   // __asm__("sti");
 
     for(;;);
 }

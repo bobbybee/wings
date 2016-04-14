@@ -14,13 +14,10 @@ dd MAGIC
 dd FLAGS
 dd CHECKSUM
 
-; stack
-section .bootstack:
-align 4
-
-stack_bottom:
+section .stack nobits:
+stackBottom:
 times 16384 db 0
-stack_top:
+stackTop:
 
 ; bootstrap
 section .text:
@@ -28,7 +25,7 @@ global _start
 extern kmain
 
 _start:
-    mov esp, stack_top
+    mov esp, stackTop
 
     call kmain
 
