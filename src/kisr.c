@@ -1,5 +1,6 @@
 #include <kstandard.h>
 #include <ktextvga.h>
+#include <kps2keyboard.h>
 
 // generic interrupt handler
 
@@ -13,6 +14,10 @@ void irqHandler(uint32_t number) {
     kputs("Received IRQ: ");
     kputnum(number, 16);
     kputchar('\n');
+
+    if(number == 1) {
+        ps2KeyboardIRQ();
+    }
 
     // acknowledge IRQ
     if(number > 0x8) outb(0xA0, 0x20);
