@@ -196,7 +196,7 @@ irqHandlerInterm:
     mov gs, ax
 
     popa
-    add esp, 8
+    add esp, 4
 
     sti
     iret

@@ -18,8 +18,8 @@ void kmain() {
     initGDT();
     initIDT();
 //    initPIC();
-    maskPIC(0xFD, 0xFF);
-    __asm__("int $0xA");
+    maskPIC(0xFF, 0xFF);
+    __asm__("int $0x1");
     __asm__("sti");
 
     for(;;);

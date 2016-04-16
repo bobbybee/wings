@@ -5,7 +5,7 @@
 #include <kidt.h>
 #include <ktextvga.h>
 
-typedef uint16_t IDTEntry[8];
+typedef uint16_t IDTEntry[4];
 IDTEntry idtTable[48];
 
 void idtEntry(int number, void* offset, uint16_t selector, uint8_t flags);
@@ -50,8 +50,8 @@ void idtEntry(
         void* offset,
         uint16_t selector,
         uint8_t flags) {
-    idtTable[number][0] = (uint32_t) offset & 0xFFFF;
+    idtTable[number][0] = (uint16_t) ((uint32_t) offset & 0xFFFF);
     idtTable[number][1] = selector;
     idtTable[number][2] = flags << 8;
-    idtTable[number][3] = (uint32_t) offset >> 16;
+    idtTable[number][3] = (uint16_t) ((uint32_t) offset >> 16);
 }
