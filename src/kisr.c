@@ -11,12 +11,12 @@ void isrHandler(uint32_t number) {
 }
 
 void irqHandler(uint32_t number) {
-    kputs("Received IRQ: ");
-    kputnum(number, 16);
-    kputchar('\n');
-
     if(number == 1) {
         ps2KeyboardIRQ();
+    } else {
+        kputs("Received unhandled IRQ: ");
+        kputnum(number, 16);
+        kputchar('\n');
     }
 
     // acknowledge IRQ
