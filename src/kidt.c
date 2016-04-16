@@ -23,18 +23,8 @@ void* idtOffsets[] = {
 void initIDT() {
     kputs("IDT initialization...\n");
 
-    for(int gate = 0; gate < 32; ++gate) {
-        kputs("Trap ");
-        kputnum(gate, 16);
-        kputchar('\n');
+    for(int gate = 0; gate < 47; ++gate) {
         idtEntry(gate, idtOffsets[gate], 0x8, IDT_GATE_PRESENT | IDT_GATE_TRAP | IDT_MIN_RING0);
-    }
-
-    for(int gate = 32; gate < 48; ++gate) {
-        kputs("Interrupt ");
-        kputnum(gate, 16);
-        kputchar('\n');
-        idtEntry(gate, idtOffsets[gate], 0x8, IDT_GATE_PRESENT | IDT_GATE_INTERRUPT | IDT_MIN_RING0);
     }
 
     struct descriptorPtr ptr;
