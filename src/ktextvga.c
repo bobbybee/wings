@@ -27,6 +27,7 @@ inline void kputchar(char a) {
     if(cursorY == 24) {
         kmemcpy(VGABaseAddress, VGABaseAddress + 80, (80 * 2 * (24 - 1)));
         cursorY--;
+        kmemset(VGABaseAddress + (80 * 23), 0, (80 * 2));
     }
 }
 

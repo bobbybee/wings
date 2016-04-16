@@ -14,7 +14,7 @@ dd MAGIC
 dd FLAGS
 dd CHECKSUM
 
-section .stack nobits:
+section .stack:
 stackBottom:
 times 16384 db 0
 stackTop:
@@ -129,10 +129,8 @@ isrHandlerInterm:
 
     mov eax, [esp + 34]
     push eax
-    mov eax, [esp + 42]
-    push eax
     call isrHandler
-    add esp, 8
+    add esp, 4
 
     pop ax
     mov ds, ax

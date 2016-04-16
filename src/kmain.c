@@ -17,8 +17,9 @@ void kmain() {
     __asm__("cli");
     initGDT();
     initIDT();
-    initPIC();
+//    initPIC();
     maskPIC(0xFD, 0xFF);
+    __asm__("int $0xA");
     __asm__("sti");
 
     for(;;);

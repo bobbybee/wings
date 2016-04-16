@@ -1,4 +1,4 @@
-CFLAGS=-Wall -Werror -Wextra -nostdlib -ffreestanding -O3 -c -std=gnu99 -march=i386 -m32 -Isrc/
+CFLAGS=-Wall -Werror -Wextra -nostdlib -ffreestanding -O2 -c -std=gnu99 -march=i386 -m32 -Isrc/
 COBJECTS=bin/boot.o bin/kmain.o bin/ktextvga.o bin/kmemory.o bin/kgdt.o bin/kidt.o bin/kisr.o
 
 bin/kernel.elf: bin/boot.o $(COBJECTS)
