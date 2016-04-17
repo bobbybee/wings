@@ -20,6 +20,19 @@ char qwerty_US_lower[] = {
     ' ', // 39
 };
 
+char qwerty_US_upper[] = {
+    NULL, NULL, // 0, 1
+    '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\b', // 2-E
+    '\t', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n', // F-1C
+    NULL, // 1D
+    'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', // 1E-28
+    NULL, NULL, // 29, 2A
+    '|', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', // 2B-35
+    NULL, NULL, NULL, // 36-38
+    ' ', // 39
+};
+
+
 void ps2KeyboardIRQ() {
     uint8_t c = inb(0x60);
 
@@ -31,7 +44,7 @@ void ps2KeyboardIRQ() {
                 }
             } else {
                 if(isShift) {
-                    kputchar(qwerty_US_lower[c]);
+                    kputchar(qwerty_US_upper[c]);
                     isShift = false;
                 } else {
                     kputchar(qwerty_US_lower[c]);
