@@ -22,12 +22,27 @@ stackTop:
 ; bootstrap
 section .text:
 global _start
-extern kmain
+
+extern initGDT
+extern initIDT
 
 _start:
     mov esp, stackTop
 
-    call kmain
+    cli
+    call initGDT
+    call initIDT
+    call initPIC
+    
+    push 0xFF
+    push 0xFD
+    call maskPIC
+
+    sti
+
+.loop:
+    hlt ; hlt for power efficiency
+    jmp .loop
 
 ; wither into oblivion
     cli
