@@ -36,7 +36,7 @@ void registerStream(ReactiveStream* stream, DataHandler handler) {
 }
 
 void unregisterStream(ReactiveStream* stream, DataHandler handler) {
-    // registerStream gaurentees to only be one
+    // registerStream gaurentees there is only one handle
     for(int i = 0; i < stream->handlerCount; ++i) {
         if(stream->handlers[i] == stream) {
             if(stream->handlerCount > i + 1) {
