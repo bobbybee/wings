@@ -17,4 +17,22 @@
     (close-input-port handle)
     content))
 
-(resolve (vector-ref (current-command-line-arguments) 0))
+; compile s-expressions to IR
+; emits (list ir identifier)
+
+(define (wings-to-ir code base)
+  (if (> (length code) 1)
+    (map (lambda (arg) (argument-ir arg base)) (rest code))
+    (list '() base)))
+
+(define (argument-ir code sbase)
+  (foldl (lambda (element emission)
+           (match-let
+             ([(list code base) (wings-to-ir code (second emission))])
+             (list 
+               (append code (first emission))
+               (+ base (second emission)))))
+         (list '() sbase)
+         code))
+ 
+(wings-to-ir (resolve (vector-ref (current-command-line-arguments) 0)) 0)
