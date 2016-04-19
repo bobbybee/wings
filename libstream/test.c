@@ -6,14 +6,27 @@
 #include <stdio.h>
 #include "libstream.h"
 
+ReactiveStream in, out;
+
 void screenOut(void* node) {
     putchar( (char) node);
 }
 
+void lambda0(void* node) {
+    pushStream(&out, (void*) (char) node + 1);
+}
+
 int main(int argc, char** argv) {
-    ReactiveStream out = makeStream();
+    // establish stdin
+    out = makeStream();
     registerStream(&out, screenOut);
+    in = makeStream();
 
+    // some logic
+    registerStream(&in, lambda0);
 
-    pushStream(&out, (void*) 'A');
+    // main loop
+    while(char c = getchar()) {
+        pushStream(&in, (void*) c);
+    }
 }
