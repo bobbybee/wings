@@ -20,26 +20,21 @@
 ; compile s-expressions to IR
 ; emits (list ir identifier)
 
-(define (wings-to-ir code base)
+(define (expression-to-ir code base)
   (if (list? code)
-    (foldl (lambda (element emission)
-             (list
-               (append (first element) (first emission))
-               (+ (second emission) (second element))))
-           (list '() base)
-           (map (lambda (arg) (argument-ir arg base)) (rest code)))
+    (let ([ir (arguments-to-ir (rest code) base '() '())])
+      (list (third ir) (second ir)))
     (list '() 0)))
-  
-(define (argument-ir code sbase)
-  (if (list? code)
-      (foldl (lambda (element emission)
-               (match-let
-                 ([(list code base) (wings-to-ir code (second emission))])
-                 (list 
-                   (append code (first emission))
-                   base)))
-             (list '() sbase)
-             code)
-      (wings-to-ir code sbase)))
-     
-(wings-to-ir (resolve (vector-ref (current-command-line-arguments) 0)) 0)
+
+(define (arguments-to-ir code base emission identifiers)
+  (if (empty? code)
+    (list '() base emission identifiers)
+    (match-let ([(list ir newbase) (expression-to-ir (first code) base)])
+      (arguments-to-ir
+        (rest code) 
+        newbase
+        (append ir emission)
+        (cons newbase identifiers)))))
+
+
+(expression-to-ir (resolve (vector-ref (current-command-line-arguments) 0)) 0)
