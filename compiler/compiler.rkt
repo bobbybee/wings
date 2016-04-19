@@ -24,7 +24,7 @@
   (if (list? code)
     (let ([ir (arguments-to-ir (rest code) base '() '())])
       (list (third ir) (second ir)))
-    (list '() 0)))
+    (list '() (+ base 1))))
 
 (define (arguments-to-ir code base emission identifiers)
   (if (empty? code)
@@ -35,6 +35,5 @@
         newbase
         (append ir emission)
         (cons newbase identifiers)))))
-
 
 (expression-to-ir (resolve (vector-ref (current-command-line-arguments) 0)) 0)
