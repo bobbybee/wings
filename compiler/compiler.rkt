@@ -21,10 +21,10 @@
 ; emits (list ir identifier)
 
 (define (expression-to-ir code base)
-  (if (list? code)
-    (let ([ir (arguments-to-ir (rest code) base '() '())])
-      (list (third ir) (second ir)))
-    (list '() (+ base 1))))
+  (cond
+    [(list? code) (let ([ir (arguments-to-ir (rest code) base '() '())])
+                    (list (third ir) (second ir)))]
+    [(number? code) (list (list (list "=" base code)) (+ base 1))]))
 
 (define (arguments-to-ir code base emission identifiers)
   (if (empty? code)
