@@ -15,6 +15,8 @@ ReactiveStream makeStream() {
 }
 
 void pushStream(ReactiveStream* stream, void* node) {
+    if(stream->variableCount) stream->latetst = node;
+
     for(int i = 0; i < stream->handlerCount; ++i) {
         stream->handlers[i](node);
     }
@@ -38,6 +40,10 @@ void registerStream(ReactiveStream* stream, DataHandler handler) {
     stream->handlers[stream->handlerCount++] = handler;
 }
 
+void registerVariable(ReactiveStream* stream) {
+    stream->variableCount++;
+}
+
 void unregisterStream(ReactiveStream* stream, DataHandler handler) {
     // registerStream gaurentees there is only one handle
     for(int i = 0; i < stream->handlerCount; ++i) {
@@ -49,4 +55,8 @@ void unregisterStream(ReactiveStream* stream, DataHandler handler) {
             stream->handlerCount--;
         }
     }
+}
+
+void unregisterVariable(ReactiveStream* stream) {
+    stream->variableCount--;
 }
