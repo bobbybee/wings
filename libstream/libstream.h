@@ -1,6 +1,11 @@
 #ifndef __LIBSTREAM_H
 #define __LIBSTREAM_H
 
+#include <stdlib.h>
+#include <memory.h>
+#include <stdio.h>
+#include <stddef.h>
+
 typedef void (*DataHandler)(void*);
 
 typedef struct {
