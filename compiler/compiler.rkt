@@ -21,13 +21,15 @@
 ; emits (list ir identifier)
 
 (define (wings-to-ir code base)
-  (foldl (lambda (element emission)
-           (list
-             (append (first element) (first emission))
-             (+ (second emission) (second element))))
-         (map (lambda (arg) (argument-ir arg base)) (rest code))
-         (list '() base)))
-
+  (if (list? code)
+    (foldl (lambda (element emission)
+             (list
+               (append (first element) (first emission))
+               (+ (second emission) (second element))))
+           (list '() base)
+           (map (lambda (arg) (argument-ir arg base)) (rest code)))
+    (list '() 0)))
+  
 (define (argument-ir code sbase)
   (if (list? code)
       (foldl (lambda (element emission)
