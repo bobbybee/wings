@@ -22,12 +22,19 @@
 
 (define (expression-to-ir code base)
   (cond
-    [(list? code) (call-to-ir code base)]
+    [(list? code) (case (first code) [("lambda") (lambda-to-ir code base)]
+                                     [else (call-to-ir code base)])]
     [(number? code) (list (list (list "=" base code)) (+ base 1))]))
+
+(define (lambda-to-ir code base)
+  (display "Lambda: ")
+  (display code)
+  (display "\n")
+  (list '() base))
 
 (define (call-to-ir code base)
   (let ([ir (arguments-to-ir (rest code) base '() '())])
-    (list (third ir) (second ir)))]
+    (list (third ir) (second ir))))
 
 (define (arguments-to-ir code base emission identifiers)
   (if (empty? code)
