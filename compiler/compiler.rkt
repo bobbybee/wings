@@ -18,39 +18,44 @@
     content))
 
 ; compile s-expressions to IR
-; emits (list ir identifier)
+; emits (list ir identifier (list variables lambdas)
 
-(define (expression-to-ir code base lambdas)
+(define (expression-to-ir code base ctx)
+  (display code)
+  (display "\n")
+
   (cond
-    [(list? code) (case (first code) [(lambda) (lambda-to-ir code base lambdas)]
-                                     [else (call-to-ir code base lambdas)])]
-    [(number? code) (list (list (list "=" base code)) (+ base 1) lambdas)]))
+    [(list? code) (case (first code) [(lambda) (lambda-to-ir code base ctx)]
+                                     [else (call-to-ir code base ctx)])]
+    [(number? code) (list (list (list "=" base code)) (+ base 1) ctx)]))
 
-(define (lambda-to-ir code base lambdas)
+(define (lambda-to-ir code base ctx)
   (display "Lambda: ")
   (display code)
   (display "\n")
-  (list '()
-        (length lambdas)
-        (cons (list (second code) (expression-to-ir (third code) base lambdas)))))
 
-(define (call-to-ir code base lambdas)
-  (let* ([ir (arguments-to-ir (rest code) base '() '() lambdas)]
+  (list '()
+        base
+        (list (first ctx)
+              (cons (expression-to-ir (third code) base ctx) (second ctx)))))
+
+(define (call-to-ir code base ctx)
+  (let* ([ir (arguments-to-ir (rest code) base '() '() ctx)]
          [nbase (second ir)])
     (list (cons (append (list "call" (first code))
                         (reverse (last ir)))
                 (third ir))
           (+ nbase 1)
-          lambdas)))
+          ctx)))
 
-(define (arguments-to-ir code base emission identifiers lambdas)
+(define (arguments-to-ir code base emission identifiers ctx)
   (if (empty? code)
     (list '() base emission identifiers)
-    (match-let ([(list ir newbase newlambdas) (expression-to-ir (first code) base lambdas)])
+    (match-let ([(list ir newbase nctx) (expression-to-ir (first code) base ctx)])
       (arguments-to-ir
         (rest code) 
         newbase
         (append ir emission)
-        (cons (- newbase 1) identifiers) newlambdas))))
+        (cons (- newbase 1) identifiers) nctx))))
 
 (expression-to-ir (resolve (vector-ref (current-command-line-arguments) 0)) 0 '())
