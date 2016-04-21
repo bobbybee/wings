@@ -30,10 +30,12 @@
   (display "Lambda: ")
   (display code)
   (display "\n")
-  (list '() base))
+  (list '()
+        (length lambdas)
+        (cons (list (second code) (expression-to-ir (third code) base lambdas)))))
 
 (define (call-to-ir code base lambdas)
-  (let* ([ir (arguments-to-ir (rest code) base '() '())]
+  (let* ([ir (arguments-to-ir (rest code) base '() '() lambdas)]
          [nbase (second ir)])
     (list (cons (append (list "call" (first code))
                         (reverse (last ir)))
@@ -44,11 +46,11 @@
 (define (arguments-to-ir code base emission identifiers lambdas)
   (if (empty? code)
     (list '() base emission identifiers)
-    (match-let ([(list ir newbase) (expression-to-ir (first code) base)])
+    (match-let ([(list ir newbase newlambdas) (expression-to-ir (first code) base lambdas)])
       (arguments-to-ir
         (rest code) 
         newbase
         (append ir emission)
-        (cons (- newbase 1) identifiers lambdas)))))
+        (cons (- newbase 1) identifiers) newlambdas))))
 
 (expression-to-ir (resolve (vector-ref (current-command-line-arguments) 0)) 0 '())
