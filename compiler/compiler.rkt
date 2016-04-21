@@ -35,8 +35,10 @@
 (define (call-to-ir code base)
   (let* ([ir (arguments-to-ir (rest code) base '() '())]
          [nbase (second ir)])
-    (display (last ir))
-    (list (cons (append (list "call" (first code)) (reverse (last ir))) (third ir)) (+ nbase 1))))
+    (list (cons (append (list "call" (first code))
+                        (reverse (last ir)))
+                (third ir))
+          (+ nbase 1))))
 
 (define (arguments-to-ir code base emission identifiers)
   (if (empty? code)
