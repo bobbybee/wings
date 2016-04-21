@@ -22,7 +22,7 @@
 
 (define (expression-to-ir code base)
   (cond
-    [(list? code) (case (first code) [("lambda") (lambda-to-ir code base)]
+    [(list? code) (case (first code) [(lambda) (lambda-to-ir code base)]
                                      [else (call-to-ir code base)])]
     [(number? code) (list (list (list "=" base code)) (+ base 1))]))
 
