@@ -23,13 +23,15 @@
 (define (expression-to-ir code base ctx)
   (display code)
   (display (first ctx))
+  (display (not (false? (member code (first ctx)))) )
   (display "\n")
 
   (cond
-    [(list? code) (case (first code) [(lambda) (lambda-to-ir code base ctx)]
-                                     [else (call-to-ir code base ctx)])]
-    [(number? code) (list (list (list "=" base code)) (+ base 1) ctx)]
-    [(member code (first ctx)) code]))
+    [(list? code)
+     (case (first code) [(lambda) (lambda-to-ir code base ctx)]
+                        [else (call-to-ir code base ctx)])]
+    [(or (number? code) (not (false? (member code (first ctx)))))
+     (list (list (list "=" base code)) (+ base 1) ctx)]))
 
 (define (lambda-to-ir code base ctx)
   (display "Lambda: ")
