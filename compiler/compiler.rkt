@@ -22,12 +22,14 @@
 
 (define (expression-to-ir code base ctx)
   (display code)
+  (display (first ctx))
   (display "\n")
 
   (cond
     [(list? code) (case (first code) [(lambda) (lambda-to-ir code base ctx)]
                                      [else (call-to-ir code base ctx)])]
-    [(number? code) (list (list (list "=" base code)) (+ base 1) ctx)]))
+    [(number? code) (list (list (list "=" base code)) (+ base 1) ctx)]
+    [(member code (first ctx)) code]))
 
 (define (lambda-to-ir code base ctx)
   (display "Lambda: ")
@@ -37,7 +39,10 @@
   (list '()
         base
         (list (first ctx)
-              (cons (expression-to-ir (third code) base ctx) (second ctx)))))
+              (cons (expression-to-ir (third code)
+                                      base
+                                      (list (append (second code) (first ctx))
+                                            (second ctx))) (second ctx)))))
 
 (define (call-to-ir code base ctx)
   (let* ([ir (arguments-to-ir (rest code) base '() '() ctx)]
@@ -58,4 +63,5 @@
         (append ir emission)
         (cons (- newbase 1) identifiers) nctx))))
 
-(expression-to-ir (resolve (vector-ref (current-command-line-arguments) 0)) 0 '('() '()))
+(expression-to-ir (resolve (vector-ref (current-command-line-arguments) 0))
+                  0 (list '() '()))
