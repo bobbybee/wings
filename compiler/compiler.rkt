@@ -20,27 +20,28 @@
 ; compile s-expressions to IR
 ; emits (list ir identifier)
 
-(define (expression-to-ir code base)
+(define (expression-to-ir code base lambdas)
   (cond
-    [(list? code) (case (first code) [(lambda) (lambda-to-ir code base)]
-                                     [else (call-to-ir code base)])]
-    [(number? code) (list (list (list "=" base code)) (+ base 1))]))
+    [(list? code) (case (first code) [(lambda) (lambda-to-ir code base lambdas)]
+                                     [else (call-to-ir code base lambdas)])]
+    [(number? code) (list (list (list "=" base code)) (+ base 1) lambdas)]))
 
-(define (lambda-to-ir code base)
+(define (lambda-to-ir code base lambdas)
   (display "Lambda: ")
   (display code)
   (display "\n")
   (list '() base))
 
-(define (call-to-ir code base)
+(define (call-to-ir code base lambdas)
   (let* ([ir (arguments-to-ir (rest code) base '() '())]
          [nbase (second ir)])
     (list (cons (append (list "call" (first code))
                         (reverse (last ir)))
                 (third ir))
-          (+ nbase 1))))
+          (+ nbase 1)
+          lambdas)))
 
-(define (arguments-to-ir code base emission identifiers)
+(define (arguments-to-ir code base emission identifiers lambdas)
   (if (empty? code)
     (list '() base emission identifiers)
     (match-let ([(list ir newbase) (expression-to-ir (first code) base)])
@@ -48,6 +49,6 @@
         (rest code) 
         newbase
         (append ir emission)
-        (cons (- newbase 1) identifiers)))))
+        (cons (- newbase 1) identifiers lambdas)))))
 
-(expression-to-ir (resolve (vector-ref (current-command-line-arguments) 0)) 0)
+(expression-to-ir (resolve (vector-ref (current-command-line-arguments) 0)) 0 '())
