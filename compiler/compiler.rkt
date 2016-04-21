@@ -21,11 +21,6 @@
 ; emits (list ir identifier (list variables lambdas)
 
 (define (expression-to-ir code base ctx)
-  (display code)
-  (display (first ctx))
-  (display (not (false? (member code (first ctx)))) )
-  (display "\n")
-
   (cond
     [(list? code)
      (case (first code) [(lambda) (lambda-to-ir code base ctx)]
@@ -34,17 +29,13 @@
      (list (list (list "=" base code)) (+ base 1) ctx)]))
 
 (define (lambda-to-ir code base ctx)
-  (display "Lambda: ")
-  (display code)
-  (display "\n")
-
   (list '()
         base
         (list (first ctx)
-              (cons (expression-to-ir (third code)
+              (cons (first (expression-to-ir (third code)
                                       base
                                       (list (append (second code) (first ctx))
-                                            (second ctx))) (second ctx)))))
+                                            (second ctx)))) (second ctx)))))
 
 (define (call-to-ir code base ctx)
   (let* ([ir (arguments-to-ir (rest code) base '() '() ctx)]
