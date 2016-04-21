@@ -58,4 +58,4 @@
         (append ir emission)
         (cons (- newbase 1) identifiers) nctx))))
 
-(expression-to-ir (resolve (vector-ref (current-command-line-arguments) 0)) 0 '())
+(expression-to-ir (resolve (vector-ref (current-command-line-arguments) 0)) 0 '('() '()))
