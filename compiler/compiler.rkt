@@ -36,7 +36,7 @@
   (let* ([ir (arguments-to-ir (rest code) base '() '())]
          [nbase (second ir)])
     (display (last ir))
-    (list (cons (append (list "call" (first code)) (last ir)) (third ir)) (+ nbase 1))))
+    (list (cons (append (list "call" (first code)) (reverse (last ir))) (third ir)) (+ nbase 1))))
 
 (define (arguments-to-ir code base emission identifiers)
   (if (empty? code)
@@ -46,6 +46,6 @@
         (rest code) 
         newbase
         (append ir emission)
-        (cons newbase identifiers)))))
+        (cons (- newbase 1) identifiers)))))
 
 (expression-to-ir (resolve (vector-ref (current-command-line-arguments) 0)) 0)
