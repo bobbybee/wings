@@ -30,14 +30,20 @@
      (list '() (list "imm" code) ctx)]
     [(member code (hash-ref ctx 'locals))
      (list '() (list "local" code) ctx)]
-    [(member code (hash-ref ctx 'globals))
+    [(hash-has-key? (hash-ref ctx 'globals) code)
      (list '() (list "global" code) ctx)]))
 
 (define (define-to-ir code ctx)
-  (match-let ([(list ir identifier nctx) (expression-to-ir (third code) ctx)])
-    (list '() #f (hash-set nctx 'globals (hash-set (hash-ref nctx 'globals)
-                                                   (second code)
-                                                   identifier)))))
+  (if (list? (second code))
+    (define-to-ir 
+      (list "define"
+            (first (second code))
+            (append (list "lambda" (rest (second code))) (cddr code)))
+      ctx)
+    (match-let ([(list ir identifier nctx) (expression-to-ir (third code) ctx)])
+      (list '() #f (hash-set nctx 'globals (hash-set (hash-ref nctx 'globals)
+                                                     (second code)
+                                                     identifier))))))
 
 (define (lambda-to-ir code ctx)
   (match-let ([(list ir identifier nctx)
