@@ -46,11 +46,11 @@
                                         (reverse (last ir))))
                 (third ir))
           (+ nbase 1)
-          ctx)))
+          (last ir))))
 
 (define (arguments-to-ir code base emission identifiers ctx)
   (if (empty? code)
-    (list '() base emission identifiers)
+    (list '() base emission identifiers ctx)
     (match-let ([(list ir newbase nctx) (expression-to-ir (first code) base ctx)])
       (arguments-to-ir
         (rest code) 
