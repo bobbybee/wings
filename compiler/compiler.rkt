@@ -38,7 +38,7 @@
                          'globals
                          (hash-set (hash-ref ctx 'globals)
                                    (second code)
-                                   (expression-to-ir (third code) ctx)))))
+                                   (second (expression-to-ir (third code) ctx))))))
 
 (define (lambda-to-ir code base ctx)
   (match-let ([(list ir identifier nctx)
