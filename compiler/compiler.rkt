@@ -40,8 +40,8 @@
 (define (call-to-ir code base ctx)
   (let* ([ir (arguments-to-ir (rest code) base '() '() ctx)]
          [nbase (second ir)])
-    (list (cons (append (list "call" (first code))
-                        (reverse (last ir)))
+    (list (cons (list "=" nbase (append (list "call" (first code))
+                                        (reverse (last ir))))
                 (third ir))
           (+ nbase 1)
           ctx)))
