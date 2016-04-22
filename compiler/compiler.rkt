@@ -50,13 +50,14 @@
                    (hash-set ctx 'lambdas (cons ir (hash-ref ctx 'lambdas))))))
 
 (define (call-to-ir code ctx)
-  (let ([ir (arguments-to-ir (rest code) '() '() ctx)])
+  (match-let ([(list ir emission identifiers nctx)
+               (arguments-to-ir (rest code) '() '() ctx)])
     (list (cons (list "=" 
-                      (hash-ref ctx 'base)
-                      (append (list "call" (first code)) (reverse (third ir))))
-                (second ir))
-          (hash-ref ctx 'base)
-          (hash-set ctx 'base (+ (hash-ref ctx 'base) 1)))))
+                      (hash-ref nctx 'base)
+                      (append (list "call" (first code)) (reverse identifiers)))
+                emission)
+          (hash-ref nctx 'base)
+          (hash-set nctx 'base (+ (hash-ref nctx 'base) 1)))))
 
 (define (arguments-to-ir code emission identifiers ctx)
   (if (empty? code)
