@@ -31,7 +31,7 @@
      (list (list (list "=" base (list "local" code))) (+ base 1) ctx)]))
 
 (define (lambda-to-ir code base ctx)
-  (list '()
+  (list (list (list "=" base (list "lambda" (length (second ctx)))))
         base
         (list (first ctx)
               (cons (first (expression-to-ir (third code)
