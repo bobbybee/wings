@@ -47,7 +47,7 @@
                                                                (hash-ref ctx 'locals))))])
              (list '()
                    (list "lambda" (length (hash-ref nctx 'lambdas))) 
-                   (hash-set ctx 'globals (cons ir (hash-ref ctx 'globals))))))
+                   (hash-set ctx 'lambdas (cons ir (hash-ref ctx 'lambdas))))))
 
 (define (call-to-ir code ctx)
   (let ([ir (arguments-to-ir (rest code) '() '() ctx)])
