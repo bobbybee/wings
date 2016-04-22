@@ -36,8 +36,9 @@
 (define (define-to-ir code ctx)
   (list '() #f (hash-set ctx
                          'globals
-                         (second code)
-                         (expression-to-ir (third code) ctx))))
+                         (hash-set (hash-ref ctx 'globals)
+                                   (second code)
+                                   (expression-to-ir (third code) ctx)))))
 
 (define (lambda-to-ir code base ctx)
   (match-let ([(list ir identifier nctx)
@@ -67,4 +68,4 @@
         nctx))))
 
 (expression-to-ir (resolve (vector-ref (current-command-line-arguments) 0))
-                  0 (hash 'locals '() 'globals (hash) 'base 0 'lambdas '()))
+                  (hash 'locals '() 'globals (hash) 'base 0 'lambdas '()))
