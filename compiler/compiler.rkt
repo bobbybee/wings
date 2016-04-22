@@ -31,13 +31,14 @@
      (list (list (list "=" base (list "local" code))) (+ base 1) ctx)]))
 
 (define (lambda-to-ir code base ctx)
-  (list (list (list "=" base (list "lambda" (length (second ctx)))))
-        (+ base 1)
-        (list (first ctx)
-              (cons (first (expression-to-ir (third code)
-                                      base
-                                      (list (append (second code) (first ctx))
-                                            (second ctx)))) (second ctx)))))
+  (match-let ([(list ir identifier nctx)
+               (expression-to-ir (third code)
+                                 base
+                                 (list (append (second code) (first ctx))
+                                       (second ctx)))])
+      (list (list (list "=" base (list "lambda" (length (second ctx)))))
+            (+ base 1)
+            (list (first ctx) (cons ir (second nctx))))))
 
 (define (call-to-ir code base ctx)
   (let* ([ir (arguments-to-ir (rest code) base '() '() ctx)]
