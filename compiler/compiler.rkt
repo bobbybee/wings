@@ -46,7 +46,7 @@
                                  (hash-set ctx 'locals (append (second code)
                                                                (hash-ref ctx 'locals))))])
              (list '()
-                   (list "lambda" (length (hash-ref nctx 'lambdas))) 
+                   (list "lambda" (length (hash-ref ctx 'lambdas))) 
                    (hash-set nctx 'lambdas (cons ir (hash-ref nctx 'lambdas))))))
 
 (define (call-to-ir code ctx)
