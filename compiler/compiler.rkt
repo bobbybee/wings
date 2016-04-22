@@ -36,9 +36,9 @@
 (define (define-to-ir code ctx)
   (if (list? (second code))
     (define-to-ir 
-      (list "define"
+      (list 'define
             (first (second code))
-            (append (list "lambda" (rest (second code))) (cddr code)))
+            (append (list 'lambda (rest (second code))) (cddr code)))
       ctx)
     (match-let ([(list ir identifier nctx) (expression-to-ir (third code) ctx)])
       (list '() #f (hash-set nctx 'globals (hash-set (hash-ref nctx 'globals)
