@@ -47,7 +47,7 @@
                                                                (hash-ref ctx 'locals))))])
              (list '()
                    (list "lambda" (length (hash-ref nctx 'lambdas))) 
-                   (hash-set ctx 'lambdas (cons ir (hash-ref ctx 'lambdas))))))
+                   (hash-set nctx 'lambdas (cons ir (hash-ref nctx 'lambdas))))))
 
 (define (call-to-ir code ctx)
   (match-let ([(list ir emission identifiers nctx)
