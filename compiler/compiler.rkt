@@ -28,9 +28,9 @@
                         [else (call-to-ir code ctx)])]
     [(number? code)
      (list '() (list "imm" code) ctx)]
-    [(member code (first ctx))
+    [(member code (hash-ref ctx 'locals))
      (list '() (list "local" code) ctx)]
-    [(member code (second ctx))
+    [(member code (hash-ref ctx 'globals))
      (list '() (list "global" code) ctx)]))
 
 (define (define-to-ir code ctx)
@@ -40,22 +40,23 @@
                                    (second code)
                                    (second (expression-to-ir (third code) ctx))))))
 
-(define (lambda-to-ir code base ctx)
+(define (lambda-to-ir code ctx)
   (match-let ([(list ir identifier nctx)
                (expression-to-ir (third code)
                                  (hash-set ctx 'locals (append (second code)
                                                                (hash-ref ctx 'locals))))])
              (list '()
-                   ("lambda" (length (hash-ref nctx 'lambdas))) 
+                   (list "lambda" (length (hash-ref nctx 'lambdas))) 
                    (hash-set ctx 'globals (cons ir (hash-ref ctx 'globals))))))
 
 (define (call-to-ir code ctx)
   (let ([ir (arguments-to-ir (rest code) '() '() ctx)])
     (list (cons (list "=" 
                       (hash-ref ctx 'base)
-                      (append (list "call" (first code) (reverse (third ir)))
-                              (second ir)))
-                (hash-set ctx 'base (+ (hash-ref ctx 'base) 1))))))
+                      (append (list "call" (first code)) (reverse (third ir))))
+                (second ir))
+          (hash-ref ctx 'base)
+          (hash-set ctx 'base (+ (hash-ref ctx 'base) 1)))))
 
 (define (arguments-to-ir code emission identifiers ctx)
   (if (empty? code)
