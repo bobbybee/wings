@@ -18,56 +18,53 @@
     content))
 
 ; compile s-expressions to IR
-; emits (list ir identifier (list locals globals closures)
+; emits (list ir identifier (hash base locals globals closures)
 
-(define (expression-to-ir code base ctx)
+(define (expression-to-ir code ctx)
   (cond
     [(list? code)
-     (case (first code) [(lambda) (lambda-to-ir code base ctx)]
-                        [(define) (define-to-ir code base ctx)]
-                        [else (call-to-ir code base ctx)])]
+     (case (first code) [(lambda) (lambda-to-ir code ctx)]
+                        [(define) (define-to-ir code ctx)]
+                        [else (call-to-ir code ctx)])]
     [(number? code)
-     (list (list (list "=" base (list "imm" code))) (+ base 1) ctx)]
+     (list '() (list "imm" code) ctx)]
     [(member code (first ctx))
-     (list (list (list "=" base (list "local" code))) (+ base 1) ctx)]
+     (list '() (list "local" code) ctx)]
     [(member code (second ctx))
-     (list (list (list "=" base (list "global" code))) (+ base 1) ctx)]))
+     (list '() (list "global" code) ctx)]))
 
-(define (define-to-ir code base ctx)
-  (list '() base (list (first ctx)
-                       (hash-set (second ctx)
-                                 (second code)
-                                 (expression-to-ir (third code) base ctx))
-                       (third ctx))))
+(define (define-to-ir code ctx)
+  (list '() #f (hash-set ctx
+                         'globals
+                         (second code)
+                         (expression-to-ir (third code) ctx))))
 
 (define (lambda-to-ir code base ctx)
   (match-let ([(list ir identifier nctx)
                (expression-to-ir (third code)
-                                 base
-                                 (list (append (second code) (first ctx))
-                                       (third ctx)))])
-      (list (list (list "=" base (list "lambda" (length (third ctx)))))
-            (+ base 1)
-            (list (first ctx) (cons ir (third nctx))))))
+                                 (hash-set ctx 'locals (append (second code)
+                                                               (hash-ref ctx 'locals))))])
+             (list '()
+                   ("lambda" (length (hash-ref nctx 'lambdas))) 
+                   (hash-set ctx 'globals (cons ir (hash-ref ctx 'globals))))))
 
-(define (call-to-ir code base ctx)
-  (let* ([ir (arguments-to-ir (rest code) base '() '() ctx)]
-         [nbase (second ir)])
-    (list (cons (list "=" nbase (append (list "call" (first code))
-                                        (reverse (fourth ir))))
-                (third ir))
-          (+ nbase 1)
-          (last ir))))
+(define (call-to-ir code ctx)
+  (let* ([ir (arguments-to-ir (rest code) '() '() ctx)])
+    (list (cons (list "=" 
+                      (hash-ref ctx 'base)
+                      (append (list "call" (first code) (reverse (third ir)))
+                              (second ir)))
+                (hash-set ctx 'base (+ (hash-ref ctx 'base) 1))))))
 
-(define (arguments-to-ir code base emission identifiers ctx)
+(define (arguments-to-ir code emission identifiers ctx)
   (if (empty? code)
-    (list '() base emission identifiers ctx)
-    (match-let ([(list ir newbase nctx) (expression-to-ir (first code) base ctx)])
+    (list '() emission identifiers ctx)
+    (match-let ([(list ir nctx) (expression-to-ir (first code) ctx)])
       (arguments-to-ir
         (rest code) 
-        newbase
         (append ir emission)
-        (cons (- newbase 1) identifiers) nctx))))
+        (cons (- (hash-ref nctx 'base) 1) identifiers)
+        nctx))))
 
 (expression-to-ir (resolve (vector-ref (current-command-line-arguments) 0))
-                  0 (list '() (hash) '()))
+                  0 (hash 'locals '() 'globals (hash) 'base 0 'lambdas '()))
