@@ -34,11 +34,10 @@
      (list '() (list "global" code) ctx)]))
 
 (define (define-to-ir code ctx)
-  (list '() #f (hash-set ctx
-                         'globals
-                         (hash-set (hash-ref ctx 'globals)
-                                   (second code)
-                                   (second (expression-to-ir (third code) ctx))))))
+  (match-let ([(list ir identifier nctx) (expression-to-ir (third code) ctx)])
+    (list '() #f (hash-set nctx 'globals (hash-set (hash-ref nctx 'globals)
+                                                   (second code)
+                                                   identifier)))))
 
 (define (lambda-to-ir code ctx)
   (match-let ([(list ir identifier nctx)
