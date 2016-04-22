@@ -50,7 +50,7 @@
                    (hash-set ctx 'globals (cons ir (hash-ref ctx 'globals))))))
 
 (define (call-to-ir code ctx)
-  (let* ([ir (arguments-to-ir (rest code) '() '() ctx)])
+  (let ([ir (arguments-to-ir (rest code) '() '() ctx)])
     (list (cons (list "=" 
                       (hash-ref ctx 'base)
                       (append (list "call" (first code) (reverse (third ir)))
@@ -60,11 +60,11 @@
 (define (arguments-to-ir code emission identifiers ctx)
   (if (empty? code)
     (list '() emission identifiers ctx)
-    (match-let ([(list ir nctx) (expression-to-ir (first code) ctx)])
+    (match-let ([(list ir id nctx) (expression-to-ir (first code) ctx)])
       (arguments-to-ir
         (rest code) 
         (append ir emission)
-        (cons (- (hash-ref nctx 'base) 1) identifiers)
+        (cons id identifiers)
         nctx))))
 
 (expression-to-ir (resolve (vector-ref (current-command-line-arguments) 0))
