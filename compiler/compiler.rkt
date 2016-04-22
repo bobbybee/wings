@@ -25,8 +25,10 @@
     [(list? code)
      (case (first code) [(lambda) (lambda-to-ir code base ctx)]
                         [else (call-to-ir code base ctx)])]
-    [(or (number? code) (member code (first ctx)))
-     (list (list (list "=" base code)) (+ base 1) ctx)]))
+    [(number? code)
+     (list (list (list "=" base (list "imm" code))) (+ base 1) ctx)]
+    [(member code (first ctx))
+     (list (list (list "=" base (list "local" code))) (+ base 1) ctx)]))
 
 (define (lambda-to-ir code base ctx)
   (list '()
