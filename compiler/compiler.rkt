@@ -18,27 +18,37 @@
     content))
 
 ; compile s-expressions to IR
-; emits (list ir identifier (list variables lambdas)
+; emits (list ir identifier (list locals globals closures)
 
 (define (expression-to-ir code base ctx)
   (cond
     [(list? code)
      (case (first code) [(lambda) (lambda-to-ir code base ctx)]
+                        [(define) (define-to-ir code base ctx)]
                         [else (call-to-ir code base ctx)])]
     [(number? code)
      (list (list (list "=" base (list "imm" code))) (+ base 1) ctx)]
     [(member code (first ctx))
-     (list (list (list "=" base (list "local" code))) (+ base 1) ctx)]))
+     (list (list (list "=" base (list "local" code))) (+ base 1) ctx)]
+    [(member code (second ctx))
+     (list (list (list "=" base (list "global" code))) (+ base 1) ctx)]))
+
+(define (define-to-ir code base ctx)
+  (list '() base (list (first ctx)
+                       (hash-set (second ctx)
+                                 (second code)
+                                 (expression-to-ir (third code) base ctx))
+                       (third ctx))))
 
 (define (lambda-to-ir code base ctx)
   (match-let ([(list ir identifier nctx)
                (expression-to-ir (third code)
                                  base
                                  (list (append (second code) (first ctx))
-                                       (second ctx)))])
-      (list (list (list "=" base (list "lambda" (length (second ctx)))))
+                                       (third ctx)))])
+      (list (list (list "=" base (list "lambda" (length (third ctx)))))
             (+ base 1)
-            (list (first ctx) (cons ir (second nctx))))))
+            (list (first ctx) (cons ir (third nctx))))))
 
 (define (call-to-ir code base ctx)
   (let* ([ir (arguments-to-ir (rest code) base '() '() ctx)]
@@ -60,4 +70,4 @@
         (cons (- newbase 1) identifiers) nctx))))
 
 (expression-to-ir (resolve (vector-ref (current-command-line-arguments) 0))
-                  0 (list '() '()))
+                  0 (list '() (hash) '()))
