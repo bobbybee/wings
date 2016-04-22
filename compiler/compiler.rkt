@@ -43,7 +43,7 @@
   (let* ([ir (arguments-to-ir (rest code) base '() '() ctx)]
          [nbase (second ir)])
     (list (cons (list "=" nbase (append (list "call" (first code))
-                                        (reverse (last ir))))
+                                        (reverse (fourth ir))))
                 (third ir))
           (+ nbase 1)
           (last ir))))
