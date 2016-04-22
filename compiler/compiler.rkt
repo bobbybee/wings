@@ -32,7 +32,7 @@
 
 (define (lambda-to-ir code base ctx)
   (list (list (list "=" base (list "lambda" (length (second ctx)))))
-        base
+        (+ base 1)
         (list (first ctx)
               (cons (first (expression-to-ir (third code)
                                       base
