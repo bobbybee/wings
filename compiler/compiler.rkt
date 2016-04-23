@@ -21,6 +21,8 @@
 ; emits (list ir identifier (hash base locals globals closures)
 
 (define (expression-to-ir code ctx)
+  (display code)
+  (display "\n")
   (cond
     [(list? code)
      (case (first code) [(lambda) (lambda-to-ir code ctx)]
@@ -29,6 +31,8 @@
                         [else (call-to-ir code ctx)])]
     [(number? code)
      (list '() (list "imm" code) ctx)]
+    [(string? code)
+     (list '() (list "immstr" code) ctx)]
     [(member code (hash-ref ctx 'locals))
      (list '() (list "local" code) ctx)]
     [(hash-has-key? (hash-ref ctx 'globals) code)
