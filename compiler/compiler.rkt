@@ -89,7 +89,19 @@
         (cons id identifiers)
         nctx))))
 
-(resolve (vector-ref (current-command-line-arguments) 0))
+(define (program-to-ir sexpr ir globals lambdas)
+    (if (empty? sexpr)
+      (reverse (ir))
+      (let ([expression (expression-to-ir (first sexpr) (hash 'locals '()
+                                                              'globals globals
+                                                              'base 0
+                                                              'lambdas lambdas))])
+        (program-to-ir (rest sexpr)
+                       (cons (first expression) ir) 
+                       (hash-ref (second expression) 'globals)
+                       (hash-ref (second expression) 'lambdas)))))
 
-;(expression-to-ir (resolve (vector-ref (current-command-line-arguments) 0))
-;                  (hash 'locals '() 'globals (hash) 'base 0 'lambdas '()))
+(program-to-ir (resolve (vector-ref (current-command-line-arguments) 0))
+               '()
+               (hash)
+               '())
