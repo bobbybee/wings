@@ -16,12 +16,6 @@
 ; You should have received a copy of the GNU General Public License
 ; along with WINGS.  If not, see <http://www.gnu.org/licenses/>.
 
-; WINGS compiler
-; currently implemented using the shared subset of WINGS and Racket,
-; to enable sane bootstrapping
-; Copyright (C) Alyssa Rosenzweig 2016
-; ALL RIGHTS RESERVED
-
 #lang racket
 
 (require racket)
