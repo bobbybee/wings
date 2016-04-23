@@ -4,14 +4,19 @@
  * in addition to providing a common ABI for the kernel to use.
  */
 
+#include <libstream.h>
+
 ReactiveStream makeStream() {
     ReactiveStream out;
     out.handlers = malloc(1);
     out.handlerCount = 0;
     out.allocatedCount = 1;
+    return out;
 }
 
 void pushStream(ReactiveStream* stream, void* node) {
+    if(stream->variableCount) stream->latetst = node;
+
     for(int i = 0; i < stream->handlerCount; ++i) {
         stream->handlers[i](node);
     }
@@ -32,13 +37,17 @@ void registerStream(ReactiveStream* stream, DataHandler handler) {
         stream->allocatedCount *= 2;
     }
 
-    stream->handlers[++stream->handlerCount] = handler;
+    stream->handlers[stream->handlerCount++] = handler;
+}
+
+void registerVariable(ReactiveStream* stream) {
+    stream->variableCount++;
 }
 
 void unregisterStream(ReactiveStream* stream, DataHandler handler) {
-    // registerStream gaurentees to only be one
+    // registerStream gaurentees there is only one handle
     for(int i = 0; i < stream->handlerCount; ++i) {
-        if(stream->handlers[i] == stream) {
+        if(stream->handlers[i] == handler) {
             if(stream->handlerCount > i + 1) {
                 memmove(stream->handlers[i], stream->handlers[i + 1], stream->handlerCount - i);
             }
@@ -46,4 +55,8 @@ void unregisterStream(ReactiveStream* stream, DataHandler handler) {
             stream->handlerCount--;
         }
     }
+}
+
+void unregisterVariable(ReactiveStream* stream) {
+    stream->variableCount--;
 }
