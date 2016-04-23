@@ -25,6 +25,7 @@
     [(list? code)
      (case (first code) [(lambda) (lambda-to-ir code ctx)]
                         [(define) (define-to-ir code ctx)]
+                        [(quote) (quote-to-ir (second code) ctx)]
                         [else (call-to-ir code ctx)])]
     [(number? code)
      (list '() (list "imm" code) ctx)]
@@ -53,6 +54,10 @@
              (list '()
                    (list "lambda" (length (hash-ref ctx 'lambdas))) 
                    (hash-set nctx 'lambdas (cons ir (hash-ref nctx 'lambdas))))))
+
+; May be unstable -- rewrite later
+(define (quote-to-ir code ctx)
+  (cond [(list? code) (expression-to-ir (cons 'list code) ctx)]))
 
 (define (call-to-ir code ctx)
   (match-let ([(list ir emission identifiers nctx)
