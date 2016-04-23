@@ -27,8 +27,6 @@
 ; emits (list ir identifier (hash base locals globals closures)
 
 (define (expression-to-ir code ctx)
-  (display code)
-  (display "\n")
   (cond
     [(list? code)
      (case (first code) [(lambda) (lambda-to-ir code ctx)]
@@ -40,7 +38,7 @@
      (list '() (list "imm" code) ctx)]
     [(string? code)
      (list '() (list "immstr" code) ctx)]
-    [(member code (hash-ref ctx 'locals))
+    [(hash-has-key? (hash-ref ctx 'locals) code)
      (list '() (list "local" code) ctx)]
     [(hash-has-key? (hash-ref ctx 'globals) code)
      (list '() (list "global" code) ctx)]))
@@ -73,13 +71,14 @@
 (define (let-to-ir code ir ctx)
   (if (= (length (second code)) 0)
     (expression-to-ir (third code) ctx)
-    (let ([value (expression-to-ir (first (second code)) ctx)])
-      (let-to-ir (rest (second code))
-                 (first value)
-                 (hash-set (hash-ref (third value) 'locals)
-                           (first (first (second code)))
-                           (second value))
-                 (third value)))))
+    (let ([value (expression-to-ir (second (first (second code))) ctx)])
+      (let-to-ir (list "let" (rest (second code)) (third code))
+                 (append (first value) ir)
+                 (hash-set (third value)
+                           'locals
+                           (hash-set (hash-ref (third value) 'locals)
+                                     (first (first (second code)))
+                                     (second value)))))))
 
 (define (call-to-ir code ctx)
   (match-let ([(list ir emission identifiers nctx)
@@ -88,7 +87,6 @@
                       (hash-ref nctx 'base)
                       (append (list "call" (first code)) (reverse identifiers)))
                 emission)
-          (hash-ref nctx 'base)
           (hash-set nctx 'base (+ (hash-ref nctx 'base) 1)))))
 
 (define (arguments-to-ir code emission identifiers ctx)
@@ -103,8 +101,8 @@
 
 (define (program-to-ir sexpr ir globals lambdas)
     (if (empty? sexpr)
-      (reverse (ir))
-      (let ([expression (expression-to-ir (first sexpr) (hash 'locals '()
+      (list (reverse ir))
+      (let ([expression (expression-to-ir (first sexpr) (hash 'locals (hash)
                                                               'globals globals
                                                               'base 0
                                                               'lambdas lambdas))])
