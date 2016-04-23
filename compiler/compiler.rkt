@@ -34,6 +34,7 @@
      (case (first code) [(lambda) (lambda-to-ir code ctx)]
                         [(define) (define-to-ir code ctx)]
                         [(quote) (quote-to-ir (second code) ctx)]
+                        [(let) (let-to-ir code '() ctx)]
                         [else (call-to-ir code ctx)])]
     [(number? code)
      (list '() (list "imm" code) ctx)]
@@ -68,6 +69,17 @@
 ; May be unstable -- rewrite later
 (define (quote-to-ir code ctx)
   (cond [(list? code) (expression-to-ir (cons 'list code) ctx)]))
+
+(define (let-to-ir code ir ctx)
+  (if (= (length (second code)) 0)
+    (expression-to-ir (third code) ctx)
+    (let ([value (expression-to-ir (first (second code)) ctx)])
+      (let-to-ir (rest (second code))
+                 (first value)
+                 (hash-set (hash-ref (third value) 'locals)
+                           (first (first (second code)))
+                           (second value))
+                 (third value)))))
 
 (define (call-to-ir code ctx)
   (match-let ([(list ir emission identifiers nctx)
