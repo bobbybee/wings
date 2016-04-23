@@ -11,9 +11,15 @@
 ; in the future, this is a lower-level call to resolve a URL
 ; but for now, this is just a thin wrapper around the Racket API
 
+(define (recursive-resolve handle data)
+  (let ([datum (read handle)])
+    (if (list? datum)
+      (recursive-resolve handle (cons datum data))
+      (reverse data))))
+
 (define (resolve url)
   (let* ([handle (open-input-file url)]
-         [content (read handle)])
+         [content (recursive-resolve handle '())])
     (close-input-port handle)
     content))
 
@@ -83,5 +89,7 @@
         (cons id identifiers)
         nctx))))
 
-(expression-to-ir (resolve (vector-ref (current-command-line-arguments) 0))
-                  (hash 'locals '() 'globals (hash) 'base 0 'lambdas '()))
+(resolve (vector-ref (current-command-line-arguments) 0))
+
+;(expression-to-ir (resolve (vector-ref (current-command-line-arguments) 0))
+;                  (hash 'locals '() 'globals (hash) 'base 0 'lambdas '()))
