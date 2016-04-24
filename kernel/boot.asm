@@ -112,6 +112,15 @@ loadIDT:
         jmp isrHandlerInterm
 %endmacro
 
+%macro irq 1
+    global irq%1
+    irq%1:
+        cli
+        push 0xDEADBEEF
+        push (32+%1)
+        jmp isrHandlerInterm
+%endmacro
+
 ; exception stubs
 isr_stub 0
 isr_stub 1
@@ -146,46 +155,7 @@ isr_stub 29
 isr_stub 30
 isr_stub 31
 
-; general handler
-extern isrHandler
-isrHandlerInterm:
-    pusha
-
-    mov ax, ds
-    push ax
-
-    mov ax, 0x10
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-
-    mov eax, [esp + 34]
-    push eax
-    call isrHandler
-    add esp, 4
-
-    pop ax
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-
-    popa
-    add esp, 8
-
-    sti
-    iret
-
 ; IRQ handlers
-
-%macro irq 1
-    global irq%1
-    irq%1:
-        cli
-        push %1
-        jmp irqHandlerInterm
-%endmacro
 
 irq 0
 irq 1
@@ -204,36 +174,49 @@ irq 13
 irq 14
 irq 15
 
-extern irqHandler
-irqHandlerInterm:
-    pusha
-
-    mov ax, ds
-    push ax
-
-    mov ax, 0x10
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-
-    mov eax, [esp + 34]
+extern isrHandler
+isrHandlerInterm:
     push eax
-    call irqHandler
-    add esp, 4
+    push ecx
+    push edx
+    push ebx
+    push ebp
+    push esi
+    push edi
+    push ds
+    push es
+    push fs
+    push gs
 
-    pop ax
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
+    mov ebp, 0x10
+    mov ds, ebp
+    mov es, ebp
+    mov fs, ebp
+    mov gs, ebp
 
-    popa
-    add esp, 4
+    mov ebx, esp
+    sub esp, 4
+    and esp, 0xFFFFFF00
 
-    sti
+    push ebx
+    call isrHandler
+
+    mov esp, ebx
+
+    pop gs
+    pop fs
+    pop es
+    pop ds
+    pop edi
+    pop esi
+    pop ebp
+    pop ebx
+    pop edx
+    pop ecx
+    pop eax
+
+    add esp, 8
     iret
-
 
 ; PIC remapping code
 global initPIC

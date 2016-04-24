@@ -24,8 +24,15 @@
 
 // generic interrupt handler
 
-void isrHandler(uint32_t number) {
-    kputs("Received interrupt: ");
+typedef struct {
+    uint32_t gs, fs, ds, es;
+    uint32_t edi, esi, ebp, ebx, edx, ecx, eax;
+    uint32_t number, error;
+    uint32_t cs, eflags, esp, ss;
+} interrupt_registers;
+
+void exceptionHandler(uint32_t number) {
+    kputs("Received exception: ");
     kputnum(number, 16);
     kputchar('\n');
 }
@@ -44,3 +51,7 @@ void irqHandler(uint32_t number) {
     outb(0x20, 0x20);
 }
 
+void isrHandler(interrupt_registers* context) {
+    if(context->number >= 32) irqHandler(context->number - 32);
+    else                      exceptionHandler(context->number);
+}
