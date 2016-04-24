@@ -98,7 +98,6 @@ loadIDT:
 %macro isr_code 1
     global isr%1
     isr%1:
-        cli
         push %1
         jmp isrHandlerInterm
 %endmacro
@@ -106,7 +105,6 @@ loadIDT:
 %macro isr_stub 1
     global isr%1
     isr%1:
-        cli
         push 42
         push %1
         jmp isrHandlerInterm
@@ -115,7 +113,6 @@ loadIDT:
 %macro irq 1
     global irq%1
     irq%1:
-        cli
         push 0xDEADBEEF
         push (32+%1)
         jmp isrHandlerInterm
@@ -139,7 +136,7 @@ isr_code 13
 isr_code 14
 isr_stub 15
 isr_stub 16
-isr_stub 17
+isr_code 17
 isr_stub 18
 isr_stub 19
 isr_stub 20
@@ -152,7 +149,7 @@ isr_stub 26
 isr_stub 27
 isr_stub 28
 isr_stub 29
-isr_stub 30
+isr_code 30
 isr_stub 31
 
 ; IRQ handlers
