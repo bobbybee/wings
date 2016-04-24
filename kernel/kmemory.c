@@ -20,7 +20,7 @@
 
 #include <kmemory.h>
 
-inline void kmemcpy(void* dst, void* src, ssize_t length) {
+inline void kmemcpy(void* dst, void* src, size_t length) {
     while(length--) {
         *((uint8_t*) dst) = *((uint8_t*) src);
         ++dst;
@@ -28,7 +28,7 @@ inline void kmemcpy(void* dst, void* src, ssize_t length) {
     }
 }
 
-void kmemset(void* dst, uint8_t d, ssize_t length) {
+void kmemset(void* dst, uint8_t d, size_t length) {
     while(length--) {
         *((uint8_t*) dst) = d;
         ++dst;

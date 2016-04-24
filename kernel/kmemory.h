@@ -22,7 +22,8 @@
 #define __KMEMORY_H
 
 #include <kstandard.h>
-void kmemcpy(void* dst, void* src, ssize_t length);
-void kmemset(void* dst, uint8_t byte, ssize_t length);
+
+void kmemcpy(void* dst, void* src, size_t length);
+void kmemset(void* dst, uint8_t byte, size_t length);
 
 #endif
