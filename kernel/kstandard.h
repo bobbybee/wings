@@ -23,9 +23,8 @@
 
 // (freestanding) integer types
 #include <stdint.h>
-
-typedef uint32_t size_t;
-typedef int32_t ssize_t;
+#include <stddef.h>
+#include <stdbool.h>
 
 inline void outb(uint16_t port, uint8_t byte) {
     __asm__("outb %0, %1" : : "a"(byte), "Nd"(port));
