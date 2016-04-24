@@ -50,7 +50,7 @@
      (list '() (list "imm" code) ctx)]
     [(string? code)
      (list '() (list "immstr" code) ctx)]
-    [(hash-has-key? (hash-ref ctx 'locals) code)
+    [(member code (hash-ref ctx 'locals))
      (list '() (list "local" code) ctx)]
     [(hash-has-key? (hash-ref ctx 'globals) code)
      (list '() (list "global" code) ctx)]))
@@ -82,15 +82,16 @@
 
 (define (let-to-ir code ir ctx)
   (if (= (length (second code)) 0)
-    (expression-to-ir (third code) ctx)
+    (let ([value (expression-to-ir (third code) ctx)])
+      (list (append (first value) ir) (second value) (third value)))
     (let ([value (expression-to-ir (second (first (second code))) ctx)])
       (let-to-ir (list "let" (rest (second code)) (third code))
-                 (append (first value) ir)
+                 (cons (list "=" (first (first (second code))) (second value))
+                       (append (first value) ir))
                  (hash-set (third value)
                            'locals
-                           (hash-set (hash-ref (third value) 'locals)
-                                     (first (first (second code)))
-                                     (second value)))))))
+                           (cons (first (first (second code)))
+                                 (hash-ref (third value) 'locals)))))))
 
 (define (call-to-ir code ctx)
   (match-let ([(list ir emission identifiers nctx)
@@ -99,6 +100,7 @@
                       (hash-ref nctx 'base)
                       (append (list "call" (first code)) (reverse identifiers)))
                 emission)
+          (list "local" (hash-ref nctx 'base))
           (hash-set nctx 'base (+ (hash-ref nctx 'base) 1)))))
 
 (define (arguments-to-ir code emission identifiers ctx)
@@ -114,14 +116,14 @@
 (define (program-to-ir sexpr ir globals lambdas)
     (if (empty? sexpr)
       (list (reverse ir))
-      (let ([expression (expression-to-ir (first sexpr) (hash 'locals (hash)
+      (let ([expression (expression-to-ir (first sexpr) (hash 'locals '()
                                                               'globals globals
                                                               'base 0
                                                               'lambdas lambdas))])
         (program-to-ir (rest sexpr)
                        (cons (first expression) ir) 
-                       (hash-ref (second expression) 'globals)
-                       (hash-ref (second expression) 'lambdas)))))
+                       (hash-ref (third expression) 'globals)
+                       (hash-ref (third expression) 'lambdas)))))
 
 (program-to-ir (resolve (vector-ref (current-command-line-arguments) 0))
                '()
