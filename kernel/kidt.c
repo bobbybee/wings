@@ -43,7 +43,7 @@ void* idtOffsets[] = {
 void initIDT() {
     kputs("IDT initialization...\n");
 
-    for(int gate = 0; gate < 47; ++gate) {
+    for(uint8_t gate = 0; gate < sizeof(idtOffsets) / sizeof(void*); ++gate) {
         idtEntry(gate, idtOffsets[gate], 0x8, IDT_GATE_PRESENT | IDT_GATE_TRAP | IDT_MIN_RING0);
     }
 
