@@ -45,6 +45,7 @@
                         [(define) (define-to-ir code ctx)]
                         [(quote) (quote-to-ir (second code) ctx)]
                         [(let) (let-to-ir code '() ctx)]
+                        ([(match-let) (match-let-to-ir code '() ctx)]
                         [else (call-to-ir code ctx)])]
     [(number? code)
      (list '() (list "imm" code) ctx)]
@@ -92,6 +93,36 @@
                            'locals
                            (cons (first (first (second code)))
                                  (hash-ref (third value) 'locals)))))))
+
+(define (match-let-ir code ir ctx)
+  (if (= (length (second code)) 0)
+    (let ([body (expression-to-ir (third code) ctx)])
+      (list (append (first body) ir) (second body) (third ir)))
+    (let* ([expression (expression-to-ir (second (first (second code))) ctx)]
+           [result (match-ir (first (first (second code)))
+                             (second expression)
+                             '()
+                             #t
+                             (third expression))])
+      (match-let-ir (list "match-let" (rest (second code)) (third code))
+                    (append (first result) ir)
+                    (second result)))))
+
+(define (match-ir pattern needle ir load? ctx)
+  (cond [(symbol? pattern) (match-symbol-ir pattern needle ir load? ctx)]
+        [(list pattern) (match-list-ir pattern needle ir load? ctx)]))
+
+; identifier is a boolean
+
+(define (ensure-type identifier target ctx)
+  (list (list "=" (hash-ref ctx 'base) (list "type?" identifier target))
+        (list "local" (hash-ref ctx 'base))
+        (hash-set ctx 'base (+ (hash-ref ctx 'base) 1))))
+
+(define (match-symbol-ir pattern needle ir load? ctx)
+  (let ([sanity (ensure-type needle "symbol" ctx)])
+    (display sanity)
+    (display "\n")))
 
 (define (call-to-ir code ctx)
   (match-let ([(list ir emission identifiers nctx)
