@@ -39,13 +39,17 @@
 ; emits (list ir identifier (hash base locals globals closures)
 
 (define (expression-to-ir code ctx)
+  (display "Expr: ")
+  (display code)
+  (display "\n")
+
   (cond
     [(list? code)
      (case (first code) [(lambda) (lambda-to-ir code ctx)]
                         [(define) (define-to-ir code ctx)]
                         [(quote) (quote-to-ir (second code) ctx)]
                         [(let) (let-to-ir code '() ctx)]
-                        ([(match-let) (match-let-to-ir code '() ctx)]
+                        [(match-let) (match-let-to-ir code '() ctx)]
                         [else (call-to-ir code ctx)])]
     [(number? code)
      (list '() (list "imm" code) ctx)]
@@ -94,7 +98,9 @@
                            (cons (first (first (second code)))
                                  (hash-ref (third value) 'locals)))))))
 
-(define (match-let-ir code ir ctx)
+(define (match-let-to-ir code ir ctx)
+  (display code)
+  (display "\n")
   (if (= (length (second code)) 0)
     (let ([body (expression-to-ir (third code) ctx)])
       (list (append (first body) ir) (second body) (third ir)))
@@ -104,13 +110,18 @@
                              '()
                              #t
                              (third expression))])
-      (match-let-ir (list "match-let" (rest (second code)) (third code))
+      (match-let-to-ir (list "match-let" (rest (second code)) (third code))
                     (append (first result) ir)
                     (second result)))))
 
 (define (match-ir pattern needle ir load? ctx)
+  (display "Match: ")
+  (display (symbol? pattern))
+  (display "\n")
+
   (cond [(symbol? pattern) (match-symbol-ir pattern needle ir load? ctx)]
-        [(list pattern) (match-list-ir pattern needle ir load? ctx)]))
+        [(list? pattern) (match-list-ir pattern needle ir load? ctx)]
+        [else (display "Ahhh!!! Unknown match target\n")]))
 
 ; identifier is a boolean
 
@@ -121,6 +132,13 @@
 
 (define (match-symbol-ir pattern needle ir load? ctx)
   (let ([sanity (ensure-type needle "symbol" ctx)])
+    (display "Sanity: ")
+    (display sanity)
+    (display "\n")))
+
+(define (match-list-ir pattern needle ir load? ctx)
+  (let ([sanity (ensure-type needle "list" ctx)])
+    (display "Sanity: ")
     (display sanity)
     (display "\n")))
 
