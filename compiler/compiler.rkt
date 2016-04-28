@@ -123,21 +123,20 @@
         [(list? pattern) (match-list-ir pattern needle ir load? ctx)]
         [else (display "Ahhh!!! Unknown match target\n")]))
 
-; identifier is a boolean
-
-(define (ensure-type identifier target ctx)
-  (list (list "=" (hash-ref ctx 'base) (list "type?" identifier target))
-        (list "local" (hash-ref ctx 'base))
-        (hash-set ctx 'base (+ (hash-ref ctx 'base) 1))))
-
 (define (match-symbol-ir pattern needle ir load? ctx)
-  (let ([sanity (ensure-type needle "symbol" ctx)])
+  (let ([sanity (expression-to-ir (list 'symbol? needle) ctx)])
     (display "Sanity: ")
     (display sanity)
     (display "\n")))
 
 (define (match-list-ir pattern needle ir load? ctx)
-  (let ([sanity (ensure-type needle "list" ctx)])
+  (let* ([sanity (expression-to-ir
+                   (list 'and 
+                         (list 'list? needle)
+                         (list '= 
+                               (list 'length needle) 
+                               (- (length pattern) 1)))
+                   ctx)])
     (display "Sanity: ")
     (display sanity)
     (display "\n")))
