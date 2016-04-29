@@ -39,10 +39,6 @@
 ; emits (list ir identifier (hash base locals globals closures)
 
 (define (expression-to-ir code ctx)
-  (display "Expr: ")
-  (display code)
-  (display "\n")
-
   (cond
     [(list? code)
      (case (first code) [(lambda) (lambda-to-ir code ctx)]
@@ -99,8 +95,6 @@
                                  (hash-ref (third value) 'locals)))))))
 
 (define (match-let-to-ir code ir ctx)
-  (display code)
-  (display "\n")
   (if (= (length (second code)) 0)
     (let ([body (expression-to-ir (third code) ctx)])
       (list (append (first body) ir) (second body) (third ir)))
@@ -111,14 +105,10 @@
                              #t
                              (third expression))])
       (match-let-to-ir (list "match-let" (rest (second code)) (third code))
-                    (append (first result) ir)
-                    (second result)))))
+                       (append (first result) ir)
+                       (second result)))))
 
 (define (match-ir pattern needle ir load? ctx)
-  (display "Match: ")
-  (display (symbol? pattern))
-  (display "\n")
-
   (cond [(symbol? pattern) (match-symbol-ir pattern needle ir load? ctx)]
         [(list? pattern) (match-list-ir pattern needle ir load? ctx)]
         [else (display "Ahhh!!! Unknown match target\n")]))
@@ -137,9 +127,7 @@
                                (list 'length needle) 
                                (- (length pattern) 1)))
                    ctx)])
-    (display "Sanity: ")
-    (display sanity)
-    (display "\n")))
+    (list (first sanity) (third sanity))))
 
 (define (call-to-ir code ctx)
   (match-let ([(list ir emission identifiers nctx)
