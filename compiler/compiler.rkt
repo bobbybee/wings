@@ -201,11 +201,13 @@
 (define (cond-to-ir code ctx)
   (if (= (length code) 0)
     (list '() #f ctx) ; TODO error
-    (expression-to-ir (list 'if
-                            (first (first code))
-                            (second (first code))
-                            (cons 'cond (rest code))) ctx)))
-
+    (if (and (= (length code) 1) (eq? (first (second code)) 'else))
+      (expression-to-ir (second (second code)) ctx)
+      (expression-to-ir (list 'if
+                              (first (first code))
+                              (second (first code))
+                              (cons 'cond (rest code))) ctx))))
+  
 (define (program-to-ir sexpr ir globals lambdas)
     (if (empty? sexpr)
       (list (reverse ir) globals lambdas)
