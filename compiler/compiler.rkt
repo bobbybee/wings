@@ -44,8 +44,12 @@
      (case (first code) [(lambda) (lambda-to-ir code ctx)]
                         [(define) (define-to-ir code ctx)]
                         [(quote) (quote-to-ir (second code) ctx)]
-                        [(let) (let-to-ir code '() ctx)]
+                        [(let) (let-to-ir code '() ctx)] ; todo: differentiate
+                        [(let*) (let-to-ir code '() ctx)]
                         [(match-let) (match-let-to-ir code '() ctx)]
+                        [(make-symbol) (list '()
+                                             (list "symbol" (second code))
+                                             ctx)]
                         [else (call-to-ir code ctx)])]
     [(number? code)
      (list '() (list "imm" code) ctx)]
@@ -54,7 +58,9 @@
     [(member code (hash-ref ctx 'locals))
      (list '() (list "local" code) ctx)]
     [(hash-has-key? (hash-ref ctx 'globals) code)
-     (list '() (list "global" code) ctx)]))
+     (list '() (list "global" code) ctx)]
+    [(boolean? code)
+     (list '() (list "immbool" code) ctx)]))
 
 (define (define-to-ir code ctx)
   (if (list? (second code))
@@ -79,7 +85,8 @@
 
 ; May be unstable -- rewrite later
 (define (quote-to-ir code ctx)
-  (cond [(list? code) (expression-to-ir (cons 'list code) ctx)]))
+  (cond [(list? code) (expression-to-ir (cons 'list code) ctx)]
+        [(symbol? code) (expression-to-ir (list 'make-symbol code) ctx)]))
 
 (define (let-to-ir code ir ctx)
   (if (= (length (second code)) 0)
@@ -177,7 +184,7 @@
 
 (define (program-to-ir sexpr ir globals lambdas)
     (if (empty? sexpr)
-      (list (reverse ir))
+      (list (reverse ir) globals lambdas)
       (let ([expression (expression-to-ir (first sexpr) (hash 'locals '()
                                                               'globals globals
                                                               'base 0
