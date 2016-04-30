@@ -45,6 +45,7 @@
                         [(define) (define-to-ir code ctx)]
                         [(quote) (quote-to-ir (second code) ctx)]
                         [(let) (let-to-ir code '() ctx)]
+                        [(match-let) (match-let-to-ir code '() ctx)]
                         [else (call-to-ir code ctx)])]
     [(number? code)
      (list '() (list "imm" code) ctx)]
@@ -93,6 +94,67 @@
                            (cons (first (first (second code)))
                                  (hash-ref (third value) 'locals)))))))
 
+(define (match-let-to-ir code ir ctx)
+  (if (= (length (second code)) 0)
+    (let ([body (expression-to-ir (third code) ctx)])
+      (list (append (first body) ir) (second body) (third body)))
+    (let* ([expression (expression-to-ir (second (first (second code))) ctx)]
+           [result (match-ir (first (first (second code)))
+                             (second expression)
+                             '()
+                             #t
+                             (third expression))])
+      (match-let-to-ir (list "match-let" (rest (second code)) (third code))
+                       (append (first result) ir)
+                       (second result)))))
+
+(define (match-ir pattern needle ir load? ctx)
+  (cond [(symbol? pattern) (match-symbol-ir pattern needle ir load? ctx)]
+        [(list? pattern) (match-list-ir pattern needle ir load? ctx)]
+        [else (display "Ahhh!!! Unknown match target\n")]))
+
+(define (match-symbol-ir pattern needle ir load? ctx)
+  (let ([sanity (expression-to-ir (list 'symbol? needle) ctx)])
+    (list (cons (list "=" pattern needle) (append (first sanity) ir))
+          (hash-set (third sanity)
+                    'locals
+                    (cons pattern (hash-ref (third sanity) 'locals))))))
+
+(define (match-list-ir pattern needle ir load? ctx)
+  (let* ([sanity (expression-to-ir
+                   (list 'and 
+                         (list 'list? needle)
+                         (list '= 
+                               (list 'length needle) 
+                               (- (length pattern) 1)))
+                   ctx)])
+    (match-list-body-ir (rest pattern)
+                        needle
+                        (append (first sanity) ir)
+                        load?
+                        (third sanity))))
+
+(define (match-list-body-ir pattern needle ir load? ctx)
+  (if (= (length pattern) 0)
+    (list ir ctx)
+    (let* ([current-match
+            (match-ir (first pattern)
+                      (list "local" (hash-ref ctx 'base))
+                      (cons (list "="
+                                    (hash-ref ctx 'base)
+                                    (list "call" "first" needle)) ir)
+                      load?
+                      (hash-set ctx 'base (+ (hash-ref ctx 'base) 1)))]
+           [nctx (second current-match)])
+      (match-list-body-ir (rest pattern)
+                          (list "local" (hash-ref nctx 'base))
+                          (cons (list "="
+                                      (hash-ref nctx 'base) 
+                                      (list "call" "rest" needle))
+                                (first current-match))
+                          load?
+                          (hash-set nctx 'base (+ (hash-ref nctx 'base) 1))))))
+
 (define (call-to-ir code ctx)
   (match-let ([(list ir emission identifiers nctx)
                (arguments-to-ir (rest code) '() '() ctx)])
@@ -125,7 +187,8 @@
                        (hash-ref (third expression) 'globals)
                        (hash-ref (third expression) 'lambdas)))))
 
-(program-to-ir (resolve (vector-ref (current-command-line-arguments) 0))
-               '()
-               (hash)
-               '())
+(pretty-print
+  (program-to-ir (resolve (vector-ref (current-command-line-arguments) 0))
+                 '()
+                 (hash)
+                 '()))
