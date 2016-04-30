@@ -50,6 +50,9 @@
                         [(let) (let-to-ir code '() ctx)] ; todo: differentiate
                         [(let*) (let-to-ir code '() ctx)]
                         [(match-let) (match-let-to-ir code '() ctx)]
+                        [(make-symbol) (list '()
+                                             (list "symbol" (second code))
+                                             ctx)]
                         [else (call-to-ir code ctx)])]
     [(number? code)
      (list '() (list "imm" code) ctx)]
@@ -83,7 +86,8 @@
 
 ; May be unstable -- rewrite later
 (define (quote-to-ir code ctx)
-  (cond [(list? code) (expression-to-ir (cons 'list code) ctx)]))
+  (cond [(list? code) (expression-to-ir (cons 'list code) ctx)]
+        [(symbol? code) (expression-to-ir (list 'make-symbol code) ctx)]))
 
 (define (let-to-ir code ir ctx)
   (if (= (length (second code)) 0)
