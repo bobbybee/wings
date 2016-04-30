@@ -39,10 +39,6 @@
 ; emits (list ir identifier (hash base locals globals closures)
 
 (define (expression-to-ir code ctx)
-  (display "Expr: ")
-  (display code)
-  (display "\n")
-
   (cond
     [(list? code)
      (case (first code) [(lambda) (lambda-to-ir code ctx)]
@@ -101,7 +97,7 @@
 (define (match-let-to-ir code ir ctx)
   (if (= (length (second code)) 0)
     (let ([body (expression-to-ir (third code) ctx)])
-      (list (append (first body) ir) (second body) (third ir)))
+      (list (append (first body) ir) (second body) (third body)))
     (let* ([expression (expression-to-ir (second (first (second code))) ctx)]
            [result (match-ir (first (first (second code)))
                              (second expression)
@@ -186,8 +182,6 @@
                                                               'globals globals
                                                               'base 0
                                                               'lambdas lambdas))])
-        (pretty-print expression)
-        (display "\n")
         (program-to-ir (rest sexpr)
                        (cons (first expression) ir) 
                        (hash-ref (third expression) 'globals)
