@@ -119,8 +119,10 @@
 
 (define (match-symbol-ir pattern needle ir load? ctx)
   (let ([sanity (expression-to-ir (list 'symbol? needle) ctx)])
-    (list (cons (list "=" pattern needle) (append sanity ir))
-          (hash-set ctx 'locals (cons pattern (hash-ref ctx 'locals))))))
+    (list (cons (list "=" pattern needle) (append (first sanity) ir))
+          (hash-set (third sanity)
+                    'locals
+                    (cons pattern (hash-ref (third sanity) 'locals))))))
 
 (define (match-list-ir pattern needle ir load? ctx)
   (let* ([sanity (expression-to-ir
