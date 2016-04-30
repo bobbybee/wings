@@ -39,9 +39,6 @@
 ; emits (list ir identifier (hash base locals globals closures)
 
 (define (expression-to-ir code ctx)
-;  (display "Expr: ")
-;  (display code)
-;  (display "\n")
   (cond
     [(list? code)
      (case (first code) [(lambda) (lambda-to-ir code ctx)]
