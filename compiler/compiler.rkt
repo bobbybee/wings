@@ -61,7 +61,9 @@
     [(member code (hash-ref ctx 'locals))
      (list '() (list "local" code) ctx)]
     [(hash-has-key? (hash-ref ctx 'globals) code)
-     (list '() (list "global" code) ctx)]))
+     (list '() (list "global" code) ctx)]
+    [(boolean? code)
+     (list '() (list "immbool" code) ctx)]))
 
 (define (define-to-ir code ctx)
   (if (list? (second code))
