@@ -187,12 +187,11 @@
 
 (define (program-to-ir sexpr ir globals lambdas)
     (if (empty? sexpr)
-      (list (reverse ir))
+      (list (reverse ir) globals lambdas)
       (let ([expression (expression-to-ir (first sexpr) (hash 'locals '()
                                                               'globals globals
                                                               'base 0
                                                               'lambdas lambdas))])
-        (pretty-print expression)
         (program-to-ir (rest sexpr)
                        (cons (first expression) ir) 
                        (hash-ref (third expression) 'globals)
