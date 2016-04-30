@@ -119,10 +119,8 @@
 
 (define (match-symbol-ir pattern needle ir load? ctx)
   (let ([sanity (expression-to-ir (list 'symbol? needle) ctx)])
-    
-    (display "Sanity: ")
-    (display sanity)
-    (display "\n")))
+    (list (cons (list "=" pattern needle) (append sanity ir))
+          (hash-set ctx 'locals (cons pattern (hash-ref ctx 'locals))))))
 
 (define (match-list-ir pattern needle ir load? ctx)
   (let* ([sanity (expression-to-ir
@@ -132,27 +130,28 @@
                                (list 'length needle) 
                                (- (length pattern) 1)))
                    ctx)])
-    (match-list-body-ir (rest pattern) needle (append sanity ir) load? ctx)))
+    (match-list-body-ir (rest pattern) needle (append sanity ir) load? (third sanity))))
 
 (define (match-list-body-ir pattern needle ir load? ctx)
   (if (= (length pattern) 0)
     (list ir ctx)
-    (let ([current-match
-           (match-ir (first pattern)
-                     (list "local" (hash-ref ctx 'base))
-                     (cons (list "="
-                                   (hash-ref ctx 'base)
-                                   (list "call" "first" needle)) ir)
-                     load?
-                     (hash-set ctx 'base (+ (hash-ref ctx 'base) 1)))])
+    (let* ([current-match
+            (match-ir (first pattern)
+                      (list "local" (hash-ref ctx 'base))
+                      (cons (list "="
+                                    (hash-ref ctx 'base)
+                                    (list "call" "first" needle)) ir)
+                      load?
+                      (hash-set ctx 'base (+ (hash-ref ctx 'base) 1)))]
+           [nctx (second current-match)])
       (match-list-body-ir (rest pattern)
-                          (list "local" (hash-ref ctx 'base))
+                          (list "local" (hash-ref nctx 'base))
                           (cons (list "="
-                                      (hash-ref ctx 'base) 
+                                      (hash-ref nctx 'base) 
                                       list "call" "rest" needle)
-                                (append (first current-match) ir))
+                                (first current-match))
                           load?
-                          (second current-match)))))
+                          nctx))))
 
 (define (call-to-ir code ctx)
   (match-let ([(list ir emission identifiers nctx)
@@ -181,12 +180,15 @@
                                                               'globals globals
                                                               'base 0
                                                               'lambdas lambdas))])
+        (pretty-print expression)
+        (display "\n")
         (program-to-ir (rest sexpr)
                        (cons (first expression) ir) 
                        (hash-ref (third expression) 'globals)
                        (hash-ref (third expression) 'lambdas)))))
 
-(program-to-ir (resolve (vector-ref (current-command-line-arguments) 0))
-               '()
-               (hash)
-               '())
+(pretty-print
+  (program-to-ir (resolve (vector-ref (current-command-line-arguments) 0))
+                 '()
+                 (hash)
+                 '()))
