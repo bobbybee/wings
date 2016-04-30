@@ -51,7 +51,7 @@
                                              (list "symbol" (second code))
                                              ctx)]
                         [(if) (if-to-ir code ctx)]
-                        [(cond) (cond-to-ir (rest code) ctx)]
+                        [(cond) (cond-to-ir code ctx)]
                         [else (call-to-ir code ctx)])]
     [(number? code)
      (list '() (list "imm" code) ctx)]
@@ -199,14 +199,18 @@
           (hash-set (third pathB) 'base (+ nbase 1)))))
 
 (define (cond-to-ir code ctx)
-  (if (= (length code) 0)
-    (list '() #f ctx) ; TODO error
-    (if (and (= (length code) 1) (eq? (first (second code)) 'else))
+  (if (= (length code) 2)
+    (if (eq? (first (second code)) 'else)
       (expression-to-ir (second (second code)) ctx)
       (expression-to-ir (list 'if
-                              (first (first code))
-                              (second (first code))
-                              (cons 'cond (rest code))) ctx))))
+                              (first (second code))
+                              (second (second code))
+                              (list 'error "Unresolved cond"))
+                        ctx))
+    (expression-to-ir (list 'if
+                            (first (second code))
+                            (second (second code))
+                            (cons 'cond (rest (rest code)))) ctx)))
   
 (define (program-to-ir sexpr ir globals lambdas)
     (if (empty? sexpr)
