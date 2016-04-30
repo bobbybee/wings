@@ -153,7 +153,7 @@
                                       (list "call" "rest" needle))
                                 (first current-match))
                           load?
-                          nctx))))
+                          (hash-set nctx 'base (+ (hash-ref nctx 'base) 1))))))
 
 (define (call-to-ir code ctx)
   (match-let ([(list ir emission identifiers nctx)
