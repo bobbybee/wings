@@ -119,6 +119,7 @@
 
 (define (match-symbol-ir pattern needle ir load? ctx)
   (let ([sanity (expression-to-ir (list 'symbol? needle) ctx)])
+    
     (display "Sanity: ")
     (display sanity)
     (display "\n")))
@@ -131,9 +132,9 @@
                                (list 'length needle) 
                                (- (length pattern) 1)))
                    ctx)])
-    (match-list-body-ir (rest pattern) needle ir load? ctx sanity)))
+    (match-list-body-ir (rest pattern) needle (append sanity ir) load? ctx)))
 
-(define (match-list-body-ir pattern needle ir load? ctx sanity)
+(define (match-list-body-ir pattern needle ir load? ctx)
   (if (= (length pattern) 0)
     (list ir ctx)
     (let ([current-match
@@ -149,10 +150,9 @@
                           (cons (list "="
                                       (hash-ref ctx 'base) 
                                       list "call" "rest" needle)
-                                (append (first current-match ir)))
+                                (append (first current-match) ir))
                           load?
-                          (second current-match)
-                          sanity))))
+                          (second current-match)))))
 
 (define (call-to-ir code ctx)
   (match-let ([(list ir emission identifiers nctx)
