@@ -50,6 +50,7 @@
                         [(make-symbol) (list '()
                                              (list "symbol" (second code))
                                              ctx)]
+                        [(if) (if-to-ir code ctx)]
                         [else (call-to-ir code ctx)])]
     [(number? code)
      (list '() (list "imm" code) ctx)]
@@ -182,6 +183,20 @@
         (cons id identifiers)
         nctx))))
 
+; if-statements have a special form to allow short-circuiting
+
+(define (if-to-ir code ctx)
+  (let* ([condition (expression-to-ir (second code) ctx)]
+         [pathA (expression-to-ir (third code) (third condition))]
+         [pathB (expression-to-ir (fourth code) (third pathA))]
+         [nbase (hash-ref (third pathB) 'base)])
+    (list (cons (list "=" nbase (list "if" (second condition)
+                                      (second pathA) (first pathA)
+                                      (second pathB) (first pathB)))
+                (first condition))
+          nbase
+          (hash-set (third pathB) 'base (+ nbase 1)))))
+          
 (define (program-to-ir sexpr ir globals lambdas)
     (if (empty? sexpr)
       (list (reverse ir) globals lambdas)
