@@ -39,12 +39,16 @@
 ; emits (list ir identifier (hash base locals globals closures)
 
 (define (expression-to-ir code ctx)
+  (display "Expr: ")
+  (display code)
+  (display "\n")
   (cond
     [(list? code)
      (case (first code) [(lambda) (lambda-to-ir code ctx)]
                         [(define) (define-to-ir code ctx)]
                         [(quote) (quote-to-ir (second code) ctx)]
-                        [(let) (let-to-ir code '() ctx)]
+                        [(let) (let-to-ir code '() ctx)] ; todo: differentiate
+                        [(let*) (let-to-ir code '() ctx)]
                         [(match-let) (match-let-to-ir code '() ctx)]
                         [else (call-to-ir code ctx)])]
     [(number? code)
