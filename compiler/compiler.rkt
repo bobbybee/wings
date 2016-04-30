@@ -51,6 +51,7 @@
                                              (list "symbol" (second code))
                                              ctx)]
                         [(if) (if-to-ir code ctx)]
+                        [(cond) (cond-to-ir (rest code) ctx)]
                         [else (call-to-ir code ctx)])]
     [(number? code)
      (list '() (list "imm" code) ctx)]
@@ -196,7 +197,15 @@
                 (first condition))
           nbase
           (hash-set (third pathB) 'base (+ nbase 1)))))
-          
+
+(define (cond-to-ir code ctx)
+  (if (= (length code) 0)
+    (list '() #f ctx) ; TODO error
+    (expression-to-ir (list 'if
+                            (first (first code))
+                            (second (first code))
+                            (cons 'cond (rest code))) ctx)))
+
 (define (program-to-ir sexpr ir globals lambdas)
     (if (empty? sexpr)
       (list (reverse ir) globals lambdas)
