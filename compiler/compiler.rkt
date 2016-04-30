@@ -50,6 +50,8 @@
                         [(make-symbol) (list '()
                                              (list "symbol" (second code))
                                              ctx)]
+                        [(if) (if-to-ir code ctx)]
+                        [(cond) (cond-to-ir (rest code) ctx)]
                         [else (call-to-ir code ctx)])]
     [(number? code)
      (list '() (list "imm" code) ctx)]
@@ -181,6 +183,28 @@
         (append ir emission)
         (cons id identifiers)
         nctx))))
+
+; if-statements have a special form to allow short-circuiting
+
+(define (if-to-ir code ctx)
+  (let* ([condition (expression-to-ir (second code) ctx)]
+         [pathA (expression-to-ir (third code) (third condition))]
+         [pathB (expression-to-ir (fourth code) (third pathA))]
+         [nbase (hash-ref (third pathB) 'base)])
+    (list (cons (list "=" nbase (list "if" (second condition)
+                                      (second pathA) (first pathA)
+                                      (second pathB) (first pathB)))
+                (first condition))
+          nbase
+          (hash-set (third pathB) 'base (+ nbase 1)))))
+
+(define (cond-to-ir code ctx)
+  (if (= (length code) 0)
+    (list '() #f ctx) ; TODO error
+    (expression-to-ir (list 'if
+                            (first (first code))
+                            (second (first code))
+                            (cons 'cond (rest code))) ctx)))
 
 (define (program-to-ir sexpr ir globals lambdas)
     (if (empty? sexpr)
