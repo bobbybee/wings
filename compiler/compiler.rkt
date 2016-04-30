@@ -130,7 +130,11 @@
                                (list 'length needle) 
                                (- (length pattern) 1)))
                    ctx)])
-    (match-list-body-ir (rest pattern) needle (append sanity ir) load? (third sanity))))
+    (match-list-body-ir (rest pattern)
+                        needle
+                        (append (first sanity) ir)
+                        load?
+                        (third sanity))))
 
 (define (match-list-body-ir pattern needle ir load? ctx)
   (if (= (length pattern) 0)
@@ -148,7 +152,7 @@
                           (list "local" (hash-ref nctx 'base))
                           (cons (list "="
                                       (hash-ref nctx 'base) 
-                                      list "call" "rest" needle)
+                                      (list "call" "rest" needle))
                                 (first current-match))
                           load?
                           nctx))))
