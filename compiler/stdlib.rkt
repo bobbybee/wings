@@ -71,4 +71,21 @@
     emitted
     (map-compute f (rest l) (cons (f (first l)) emitted))))
 
-(_map (lambda (x) (+ x 1)) (list 1 2 3 4))
+; hash maps are not actually implemented yet
+; for now, use a list of key-value pairs.
+; this is O(N) for all operations, which is bad.
+; but it will work.
+
+(define (hash-ref h k)
+  (if (eq? (car (first h)) k)
+    (cdr (first h))
+    (hash-ref (rest h) k)))
+
+(define (hash-set h k v)
+  (if (empty? h)
+    (list (cons k v))
+    (if (eq? (car (first h)) k)
+      (cons (cons k v) (rest h))
+      (cons (first h) (hash-set (rest h) k v)))))
+
+(hash-ref (hash-set (hash-set (hash-set '() "apples" 42) "pears" 12) "bananas" _map) "pears")
