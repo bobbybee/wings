@@ -110,14 +110,16 @@
 
 (define (read-symbol str base emitted)
   (match-let ([(list element nbase) (read-identifier str base emitted)])
-    (list (list->string (reverse emitted)) base)))
+    (if (andmap char-numeric? element)
+      (list (string->number (list->string (reverse element))) nbase)
+      (list (string->symbol (list->string (reverse element))) nbase))))
 
 (define (read-identifier str base emitted)
   (if (<= (string-length str) base)
     (list emitted base)
     (let ([c (string-ref str base)])
       (if (or (char-alphabetic? c) (or (char-numeric? c) (char=? c #\-)))
-        (read-symbol str (+ base 1) (cons c emitted))
+        (read-identifier str (+ base 1) (cons c emitted))
         (list emitted base)))))
   
 (_read "(123 456 789)")
