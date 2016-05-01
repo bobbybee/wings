@@ -25,4 +25,12 @@
 (define (_cdar l) (cdr (car l)))
 (define (_cddr l) (cdr (cdr l)))
 
-(_third (list 1 2 3 4))
+(define (_reverse l)
+  (reverse-compute l '()))
+
+(define (reverse-compute remaining emitted)
+  (if (empty? remaining)
+    emitted
+    (reverse-compute (rest remaining) (cons (first remaining) emitted))))
+
+(_reverse (list 1 2 3 4))
