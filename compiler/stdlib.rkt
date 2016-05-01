@@ -102,6 +102,7 @@
     [(#\') (read-quote str (+ base 1))]
     [(#\space #\tab #\newline) (read-compute str (+ base 1))]
     [(#\;) (read-comment str (+ base 1))]
+    [(#\#) (read-pound str (+ base 1))]
     [else (read-symbol str base)]))
 
 (define (read-list str base terminator emitted)
@@ -116,8 +117,6 @@
     (cond
       [(andmap char-numeric? element)
        (list (string->number (list->string relement)) nbase)]
-      [(eq? (first relement) #\#)
-       (list (read-pound relement) nbase)]
       [else
        (list (string->symbol (list->string relement)) nbase)])))
 
@@ -127,24 +126,30 @@
     (let ([c (string-ref str base)])
       (if (not (or
                  (eq? c #\))
-                 (eq? c #\]) 
                  (char-whitespace? c)))
         (read-identifier str (+ base 1) (cons c emitted))
         (list emitted base)))))
 
-(define (read-pound chars)
-  (case (second chars)
+(define (read-pound str index)
+  (case (string-ref str index)
     [(#\t #\T) #t]
     [(#\f #\F) #f]
-    [(#\\) (read-literal-character chars)]))
+    [(#\\) (read-literal-character str (+ index 1))]))
 
-(define (read-literal-character chars)
-  (if (= (length chars) 3)
-    (third chars)
-    (integer->char (case (list->string (rest (rest chars)))
-                     [("space") 32]
-                     [("tab") 9]
-                     [("return") 13]))))
+(define (read-literal-character str index)
+  (if (char-alphabetic? (string-ref str (+ index 1)))
+    (let ([name (read-rest-character str index '())])
+      (list (integer->char (case (first name)
+                             [("space") 32]
+                             [("tab") 9]
+                             [("newline") 13]))
+            (second name)))
+    (list (string-ref str index) (+ index 1))))
+
+(define (read-rest-character str index l)
+  (if (char-alphabetic? (string-ref str index))
+    (read-rest-character str (+ index 1) (cons (string-ref str index) l))
+    (list (list->string (reverse l)) (+ index 1))))
 
 (define (read-sstring str base emitted)
   (if (eq? (string-ref str base) #\")
