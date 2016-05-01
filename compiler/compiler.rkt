@@ -27,6 +27,7 @@
 (define (recursive-resolve str index data)
   (if (> (string-length str) index)
     (let ([datum (read-compute str index)])
+      (pretty-print datum)
       (recursive-resolve str (last datum) (cons (first datum) data)))
     (reverse data)))
 

@@ -121,11 +121,13 @@
        (list (string->symbol (list->string relement)) nbase)])))
 
 (define (read-identifier str base emitted)
+  (pretty-print emitted)
   (if (<= (string-length str) base)
     (list emitted base)
     (let ([c (string-ref str base)])
       (if (not (or
                  (eq? c #\))
+                 (eq? c #\])
                  (char-whitespace? c)))
         (read-identifier str (+ base 1) (cons c emitted))
         (list emitted base)))))
