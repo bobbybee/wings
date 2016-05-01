@@ -88,4 +88,33 @@
       (cons (cons k v) (rest h))
       (cons (first h) (hash-set (rest h) k v)))))
 
-(hash-ref (hash-set (hash-set (hash-set '() "apples" 42) "pears" 12) "bananas" _map) "pears")
+; S-expression reader
+; still but a subset, unfortunately.
+
+(define (_read str)
+  (read-compute str 0))
+
+(define (read-compute str base)
+  (case (string-ref str base)
+    [("(") (read-list str (+ base 1) ")" '())]
+    [("[") (read-list str (+ base 1) "]" '())]
+    [(" " "\t") (read-compute str (+ base 1))]
+    [else (read-symbol str base '())]))
+
+(define (read-list str base terminator emitted)
+  (if (= (string-ref str base) terminator)
+    emitted
+    (match-let ([(list element nbase) (read-compute str base)])
+      (read-list str nbase terminator (cons element emitted)))))
+
+(define (read-symbol str base emitted)
+  (pretty-print emitted)
+  (if (<= (string-length str) base)
+    (list (list->string (reverse emitted)) base)
+    (let ([c (string-ref str base)])
+      (if (or (char-alphabetic? c) (or (char-numeric? c) (char=? c #\-)))
+        (read-symbol str (+ base 1) (cons c emitted))
+        (list emitted base)))))
+  
+(_read "123")
+(read (open-input-string "123"))
