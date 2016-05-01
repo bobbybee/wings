@@ -98,6 +98,7 @@
   (case (string-ref str base)
     [(#\() (read-list str (+ base 1) #\) '())]
     [(#\[) (read-list str (+ base 1) #\] '())]
+    [(#\") (read-string str (+ base 1) '())]
     [(#\space #\tab) (read-compute str (+ base 1))]
     [else (read-symbol str base)]))
 
@@ -122,7 +123,10 @@
   (if (<= (string-length str) base)
     (list emitted base)
     (let ([c (string-ref str base)])
-      (if (not (or (char=? c #\)) (or (char=? c #\]) (char-whitespace? c))))
+      (if (not (or
+                 (char=? c #\))
+                 (char=? c #\]) 
+                 (char-whitespace? c)))
         (read-identifier str (+ base 1) (cons c emitted))
         (list emitted base)))))
 
@@ -131,5 +135,11 @@
     [(#\t #\T) #t]
     [(#\f #\F) #f]))
 
-(_read "#t")
-(read (open-input-string "#t"))
+(define (read-string str base emitted)
+  (if (eq? (string-ref str base) #\")
+    (list (list->string (reverse emitted)) (+ base 1))
+    (read-string str (+ base 1) (cons (string-ref str base) emitted))))
+
+(let ([str "\"Hello\""])
+  (pretty-print (_read str))
+  (pretty-print (read (open-input-string str))))
