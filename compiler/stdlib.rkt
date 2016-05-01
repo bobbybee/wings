@@ -96,14 +96,15 @@
 
 (define (read-compute str base)
   (case (string-ref str base)
-    [("(") (read-list str (+ base 1) ")" '())]
-    [("[") (read-list str (+ base 1) "]" '())]
-    [(" " "\t") (read-compute str (+ base 1))]
+    [(#\() (read-list str (+ base 1) #\) '())]
+    [(#\[) (read-list str (+ base 1) #\] '())]
+    [(#\space #\tab) (read-compute str (+ base 1))]
     [else (read-symbol str base '())]))
 
 (define (read-list str base terminator emitted)
-  (if (= (string-ref str base) terminator)
-    emitted
+  (pretty-print emitted)
+  (if (eq? (string-ref str base) terminator)
+    (reverse emitted)
     (match-let ([(list element nbase) (read-compute str base)])
       (read-list str nbase terminator (cons element emitted)))))
 
@@ -114,7 +115,7 @@
     (let ([c (string-ref str base)])
       (if (or (char-alphabetic? c) (or (char-numeric? c) (char=? c #\-)))
         (read-symbol str (+ base 1) (cons c emitted))
-        (list emitted base)))))
+        (list (list->string (reverse emitted)) base)))))
   
-(_read "123")
-(read (open-input-string "123"))
+(_read "(123 456 789)")
+(read (open-input-string "(123 456 789)"))
