@@ -117,9 +117,9 @@
   (if (<= (string-length str) base)
     (list emitted base)
     (let ([c (string-ref str base)])
-      (if (or (char-alphabetic? c) (or (char-numeric? c) (char=? c #\-)))
+      (if (not (or (char=? c #\)) (or (char=? c #\]) (char-whitespace? c))))
         (read-identifier str (+ base 1) (cons c emitted))
         (list emitted base)))))
   
-(_read "(123 (456 789) 789)")
-(read (open-input-string "(123 (456 789) 789)"))
+(_read "(+ 123 (* 456 789) 789)")
+(read (open-input-string "(+ 123 (* 456 789) 789)"))
