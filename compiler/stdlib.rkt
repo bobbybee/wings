@@ -92,7 +92,7 @@
 ; still but a subset, unfortunately.
 
 (define (_read str)
-  (read-compute str 0))
+  (first (read-compute str 0)))
 
 (define (read-compute str base)
   (case (string-ref str base)
@@ -102,9 +102,8 @@
     [else (read-symbol str base '())]))
 
 (define (read-list str base terminator emitted)
-  (pretty-print emitted)
   (if (eq? (string-ref str base) terminator)
-    (reverse emitted)
+    (list (reverse emitted) (+ base 1))
     (match-let ([(list element nbase) (read-compute str base)])
       (read-list str nbase terminator (cons element emitted)))))
 
@@ -122,5 +121,5 @@
         (read-identifier str (+ base 1) (cons c emitted))
         (list emitted base)))))
   
-(_read "(123 456 789)")
-(read (open-input-string "(123 456 789)"))
+(_read "(123 (456 789) 789)")
+(read (open-input-string "(123 (456 789) 789)"))
