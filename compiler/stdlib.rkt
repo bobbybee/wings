@@ -23,7 +23,7 @@
 ; reverse
 ; append
 
-#lang racket
+; #lang racket
 
 (define (_length l)
   (if (empty? l)
@@ -121,7 +121,6 @@
        (list (string->symbol (list->string relement)) nbase)])))
 
 (define (read-identifier str base emitted)
-  (pretty-print emitted)
   (if (<= (string-length str) base)
     (list emitted base)
     (let ([c (string-ref str base)])
@@ -166,7 +165,3 @@
   (if (eq? (string-ref str base) #\newline)
     (read-compute str (+ base 1))
     (read-comment str (+ base 1))))
-
-(let ([str (port->string (current-input-port))])
-  (pretty-print (_read str))
-  (pretty-print (read (open-input-string str))))
