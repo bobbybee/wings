@@ -109,13 +109,16 @@
       (read-list str nbase terminator (cons element emitted)))))
 
 (define (read-symbol str base emitted)
-  (pretty-print emitted)
+  (match-let ([(list element nbase) (read-identifier str base emitted)])
+    (list (list->string (reverse emitted)) base)))
+
+(define (read-identifier str base emitted)
   (if (<= (string-length str) base)
-    (list (list->string (reverse emitted)) base)
+    (list emitted base)
     (let ([c (string-ref str base)])
       (if (or (char-alphabetic? c) (or (char-numeric? c) (char=? c #\-)))
         (read-symbol str (+ base 1) (cons c emitted))
-        (list (list->string (reverse emitted)) base)))))
+        (list emitted base)))))
   
 (_read "(123 456 789)")
 (read (open-input-string "(123 456 789)"))
