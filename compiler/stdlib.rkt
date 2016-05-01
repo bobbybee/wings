@@ -3,6 +3,7 @@
 ; first..fourth, rest
 ; caar...cddr,
 ; reverse
+; append
 
 #lang racket
 
@@ -36,4 +37,12 @@
     emitted
     (reverse-compute (rest remaining) (cons (first remaining) emitted))))
 
-(_reverse (list 1 2 3 4))
+(define (_append head tail)
+  (append-compute (reverse head) tail))
+
+(define (append-compute head tail)
+  (if (empty? head)
+    tail
+    (append-compute (rest head) (cons (first head) tail))))
+
+(_append (list 1 2 3) (list 4 5 6))
