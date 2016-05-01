@@ -62,3 +62,13 @@
   (if (empty? head)
     tail
     (append-compute (rest head) (cons (first head) tail))))
+
+(define (_map f l)
+  (reverse (map-compute f l '())))
+
+(define (map-compute f l emitted)
+  (if (empty? l)
+    emitted
+    (map-compute f (rest l) (cons (f (first l)) emitted))))
+
+(_map (lambda (x) (+ x 1)) (list 1 2 3 4))
