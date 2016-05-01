@@ -27,7 +27,6 @@
 (define (recursive-resolve str index data)
   (if (> (string-length str) index)
     (let ([datum (read-compute str index)])
-      (pretty-print datum)
       (recursive-resolve str (last datum) (cons (first datum) data)))
     (reverse data)))
 
@@ -50,6 +49,7 @@
                         [(let) (let-to-ir code '() ctx)] ; todo: differentiate
                         [(let*) (let-to-ir code '() ctx)]
                         [(match-let) (match-let-to-ir code '() ctx)]
+                        [(match-let*) (match-let-to-ir code '() ctx)]
                         [(make-symbol) (list '()
                                              (list "symbol" (second code))
                                              ctx)]
@@ -65,7 +65,11 @@
     [(hash-has-key? (hash-ref ctx 'globals) code)
      (list '() (list "global" code) ctx)]
     [(boolean? code)
-     (list '() (list "immbool" code) ctx)]))
+     (list '() (list "immbool" code) ctx)]
+    [(char? code)
+     (list '() (list "immchar" code) ctx)]
+    [else ; next pass's problem I guess
+     (list '() (list "global" code) ctx)]))
 
 (define (define-to-ir code ctx)
   (if (list? (second code))
