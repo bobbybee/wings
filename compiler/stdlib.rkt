@@ -120,6 +120,6 @@
       (if (not (or (char=? c #\)) (or (char=? c #\]) (char-whitespace? c))))
         (read-identifier str (+ base 1) (cons c emitted))
         (list emitted base)))))
-  
-(_read "(+ 123 (* 456 789) 789)")
-(read (open-input-string "(+ 123 (* 456 789) 789)"))
+
+(_read "#t")
+(read (open-input-string "#t"))
