@@ -1,7 +1,8 @@
 ; depends on cons, car, cdr, null?, if, empty?
 ; supports length, 
-; first..fourth
-; caar...cddr
+; first..fourth, rest
+; caar...cddr,
+; reverse
 
 #lang racket
 
@@ -16,6 +17,8 @@
     (length-compute (cdr l) (+ base 1))))
 
 (define (_first l) (car l))
+(define (_rest l) (cdr l))
+
 (define (_second l) (car (cdr l)))
 (define (_third l) (car (cdr (cdr l))))
 (define (_fourth l) (car (cdr (cdr (cdr l)))))
