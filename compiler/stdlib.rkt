@@ -23,8 +23,6 @@
 ; reverse
 ; append
 
-#lang racket
-
 (define (_length l)
   (if (empty? l)
     0
@@ -76,12 +74,12 @@
 ; this is O(N) for all operations, which is bad.
 ; but it will work.
 
-(define (hash-ref h k)
+(define (_hash-ref h k)
   (if (eq? (car (first h)) k)
     (cdr (first h))
     (hash-ref (rest h) k)))
 
-(define (hash-set h k v)
+(define (_hash-set h k v)
   (if (empty? h)
     (list (cons k v))
     (if (eq? (car (first h)) k)
@@ -151,6 +149,6 @@
     (read-compute str (+ base 1))
     (read-comment str (+ base 1))))
 
-(let ([str (port->string (current-input-port))])
-  (pretty-print (_read str))
-  (pretty-print (read (open-input-string str))))
+;(let ([str (port->string (current-input-port))])
+;  (pretty-print (_read str))
+;  (pretty-print (read (open-input-string str))))

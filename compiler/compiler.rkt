@@ -19,19 +19,21 @@
 #lang racket
 
 (require racket)
+(include "stdlib.rkt")
 
 ; in the future, this is a lower-level call to resolve a URL
 ; but for now, this is just a thin wrapper around the Racket API
 
-(define (recursive-resolve handle data)
-  (let ([datum (read handle)])
-    (if (list? datum)
-      (recursive-resolve handle (cons datum data))
-      (reverse data))))
+(define (recursive-resolve str index data)
+  (if (> (string-length str) index)
+    (let ([datum (read-compute str index)])
+      (recursive-resolve str (last datum) (cons (first datum) data)))
+    (reverse data)))
 
 (define (resolve url)
   (let* ([handle (open-input-file url)]
-         [content (recursive-resolve handle '())])
+         [str (string-trim (port->string handle))]
+         [content (recursive-resolve str 0 '())])
     (close-input-port handle)
     content))
 
