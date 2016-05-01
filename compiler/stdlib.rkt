@@ -133,7 +133,16 @@
 (define (read-pound chars)
   (case (second chars)
     [(#\t #\T) #t]
-    [(#\f #\F) #f]))
+    [(#\f #\F) #f]
+    [(#\\) (read-literal-character chars)]))
+
+(define (read-literal-character chars)
+  (if (= (length chars) 3)
+    (third chars)
+    (list 'integer->char (case (list->string (rest (rest chars)))
+                           [("space") 32]
+                           [("tab") 9]
+                           [("return") 13]))))
 
 (define (read-sstring str base emitted)
   (if (eq? (string-ref str base) #\")
