@@ -99,6 +99,7 @@
     [(#\() (read-list str (+ base 1) #\) '())]
     [(#\[) (read-list str (+ base 1) #\] '())]
     [(#\") (read-sstring str (+ base 1) '())]
+    [(#\') (read-quote str (+ base 1))]
     [(#\space #\tab #\newline) (read-compute str (+ base 1))]
     [else (read-symbol str base)]))
 
@@ -139,6 +140,10 @@
   (if (eq? (string-ref str base) #\")
     (list (list->string (reverse emitted)) (+ base 1))
     (read-sstring str (+ base 1) (cons (string-ref str base) emitted))))
+
+(define (read-quote str base)
+  (let ([quoted (read-compute str base)])
+    (list (list 'quote (first quoted)) (second quoted))))
 
 (let ([str (port->string (current-input-port))])
   (pretty-print (_read str))
