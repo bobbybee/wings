@@ -101,6 +101,7 @@
     [(#\") (read-sstring str (+ base 1) '())]
     [(#\') (read-quote str (+ base 1))]
     [(#\space #\tab #\newline) (read-compute str (+ base 1))]
+    [(#\;) (read-comment str (+ base 1))]
     [else (read-symbol str base)]))
 
 (define (read-list str base terminator emitted)
@@ -144,6 +145,11 @@
 (define (read-quote str base)
   (let ([quoted (read-compute str base)])
     (list (list 'quote (first quoted)) (second quoted))))
+
+(define (read-comment str base)
+  (if (eq? (string-ref str base) #\newline)
+    (read-compute str (+ base 1))
+    (read-comment str (+ base 1))))
 
 (let ([str (port->string (current-input-port))])
   (pretty-print (_read str))
