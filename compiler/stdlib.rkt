@@ -114,7 +114,7 @@
     (cond
       [(andmap char-numeric? element)
        (list (string->number (list->string relement)) nbase)]
-      [(char=? (first relement) #\#)
+      [(eq? (first relement) #\#)
        (list (read-pound relement) nbase)]
       [else
        (list (string->symbol (list->string relement)) nbase)])))
@@ -124,8 +124,8 @@
     (list emitted base)
     (let ([c (string-ref str base)])
       (if (not (or
-                 (char=? c #\))
-                 (char=? c #\]) 
+                 (eq? c #\))
+                 (eq? c #\]) 
                  (char-whitespace? c)))
         (read-identifier str (+ base 1) (cons c emitted))
         (list emitted base)))))
@@ -140,6 +140,6 @@
     (list (list->string (reverse emitted)) (+ base 1))
     (read-string str (+ base 1) (cons (string-ref str base) emitted))))
 
-(let ([str "\"Hello\""])
+(let ([str "(if #t \"Alive\" \"Ahh!\")"])
   (pretty-print (_read str))
   (pretty-print (read (open-input-string str))))
