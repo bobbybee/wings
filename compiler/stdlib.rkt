@@ -98,8 +98,8 @@
   (case (string-ref str base)
     [(#\() (read-list str (+ base 1) #\) '())]
     [(#\[) (read-list str (+ base 1) #\] '())]
-    [(#\") (read-string str (+ base 1) '())]
-    [(#\space #\tab) (read-compute str (+ base 1))]
+    [(#\") (read-sstring str (+ base 1) '())]
+    [(#\space #\tab #\newline) (read-compute str (+ base 1))]
     [else (read-symbol str base)]))
 
 (define (read-list str base terminator emitted)
@@ -135,11 +135,11 @@
     [(#\t #\T) #t]
     [(#\f #\F) #f]))
 
-(define (read-string str base emitted)
+(define (read-sstring str base emitted)
   (if (eq? (string-ref str base) #\")
     (list (list->string (reverse emitted)) (+ base 1))
-    (read-string str (+ base 1) (cons (string-ref str base) emitted))))
+    (read-sstring str (+ base 1) (cons (string-ref str base) emitted))))
 
-(let ([str "(if #t \"Alive\" \"Ahh!\")"])
+(let ([str (port->string (current-input-port))])
   (pretty-print (_read str))
   (pretty-print (read (open-input-string str))))
