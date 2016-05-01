@@ -95,6 +95,9 @@
   (first (read-compute str 0)))
 
 (define (read-compute str base)
+  (display "B: ")
+  (display (string-ref str base))
+  (pretty-print base)
   (case (string-ref str base)
     [(#\() (read-list str (+ base 1) #\) '())]
     [(#\[) (read-list str (+ base 1) #\] '())]
@@ -106,6 +109,7 @@
     [else (read-symbol str base)]))
 
 (define (read-list str base terminator emitted)
+  (pretty-print emitted)
   (if (eq? (string-ref str base) terminator)
     (list (reverse emitted) (+ base 1))
     (match-let ([(list element nbase) (read-compute str base)])
@@ -132,8 +136,8 @@
 
 (define (read-pound str index)
   (case (string-ref str index)
-    [(#\t #\T) #t]
-    [(#\f #\F) #f]
+    [(#\t #\T) (list #t (+ index 1))]
+    [(#\f #\F) (list #f (+ index 1))]
     [(#\\) (read-literal-character str (+ index 1))]))
 
 (define (read-literal-character str index)
