@@ -99,7 +99,7 @@
     [(#\() (read-list str (+ base 1) #\) '())]
     [(#\[) (read-list str (+ base 1) #\] '())]
     [(#\space #\tab) (read-compute str (+ base 1))]
-    [else (read-symbol str base '())]))
+    [else (read-symbol str base)]))
 
 (define (read-list str base terminator emitted)
   (if (eq? (string-ref str base) terminator)
@@ -107,11 +107,16 @@
     (match-let ([(list element nbase) (read-compute str base)])
       (read-list str nbase terminator (cons element emitted)))))
 
-(define (read-symbol str base emitted)
-  (match-let ([(list element nbase) (read-identifier str base emitted)])
-    (if (andmap char-numeric? element)
-      (list (string->number (list->string (reverse element))) nbase)
-      (list (string->symbol (list->string (reverse element))) nbase))))
+(define (read-symbol str base)
+  (match-let* ([(list element nbase) (read-identifier str base '())]
+               [relement (reverse element)])
+    (cond
+      [(andmap char-numeric? element)
+       (list (string->number (list->string relement)) nbase)]
+      [(char=? (first relement) #\#)
+       (list (read-pound relement) nbase)]
+      [else
+       (list (string->symbol (list->string relement)) nbase)])))
 
 (define (read-identifier str base emitted)
   (if (<= (string-length str) base)
@@ -120,6 +125,11 @@
       (if (not (or (char=? c #\)) (or (char=? c #\]) (char-whitespace? c))))
         (read-identifier str (+ base 1) (cons c emitted))
         (list emitted base)))))
+
+(define (read-pound chars)
+  (case (second chars)
+    [(#\t #\T) #t]
+    [(#\f #\F) #f]))
 
 (_read "#t")
 (read (open-input-string "#t"))
