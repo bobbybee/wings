@@ -19,19 +19,21 @@
 #lang racket
 
 (require racket)
+(include "stdlib.rkt")
 
 ; in the future, this is a lower-level call to resolve a URL
 ; but for now, this is just a thin wrapper around the Racket API
 
-(define (recursive-resolve handle data)
-  (let ([datum (read handle)])
-    (if (list? datum)
-      (recursive-resolve handle (cons datum data))
-      (reverse data))))
+(define (recursive-resolve str index data)
+  (if (> (string-length str) index)
+    (let ([datum (read-compute str index)])
+      (recursive-resolve str (last datum) (cons (first datum) data)))
+    (reverse data)))
 
 (define (resolve url)
   (let* ([handle (open-input-file url)]
-         [content (recursive-resolve handle '())])
+         [str (string-trim (port->string handle))]
+         [content (recursive-resolve str 0 '())])
     (close-input-port handle)
     content))
 
@@ -47,6 +49,7 @@
                         [(let) (let-to-ir code '() ctx)] ; todo: differentiate
                         [(let*) (let-to-ir code '() ctx)]
                         [(match-let) (match-let-to-ir code '() ctx)]
+                        [(match-let*) (match-let-to-ir code '() ctx)]
                         [(make-symbol) (list '()
                                              (list "symbol" (second code))
                                              ctx)]
@@ -62,7 +65,11 @@
     [(hash-has-key? (hash-ref ctx 'globals) code)
      (list '() (list "global" code) ctx)]
     [(boolean? code)
-     (list '() (list "immbool" code) ctx)]))
+     (list '() (list "immbool" code) ctx)]
+    [(char? code)
+     (list '() (list "immchar" code) ctx)]
+    [else ; next pass's problem I guess
+     (list '() (list "global" code) ctx)]))
 
 (define (define-to-ir code ctx)
   (if (list? (second code))
