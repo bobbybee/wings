@@ -23,6 +23,8 @@
 ; reverse
 ; append
 
+#lang racket
+
 (define (_length l)
   (if (empty? l)
     0
@@ -139,10 +141,10 @@
 (define (read-literal-character chars)
   (if (= (length chars) 3)
     (third chars)
-    (list 'integer->char (case (list->string (rest (rest chars)))
-                           [("space") 32]
-                           [("tab") 9]
-                           [("return") 13]))))
+    (integer->char (case (list->string (rest (rest chars)))
+                     [("space") 32]
+                     [("tab") 9]
+                     [("return") 13]))))
 
 (define (read-sstring str base emitted)
   (if (eq? (string-ref str base) #\")
@@ -158,6 +160,6 @@
     (read-compute str (+ base 1))
     (read-comment str (+ base 1))))
 
-;(let ([str (port->string (current-input-port))])
-;  (pretty-print (_read str))
-;  (pretty-print (read (open-input-string str))))
+(let ([str (port->string (current-input-port))])
+  (pretty-print (_read str))
+  (pretty-print (read (open-input-string str))))
