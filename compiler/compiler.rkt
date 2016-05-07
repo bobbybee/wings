@@ -172,15 +172,17 @@
                           (hash-set nctx 'base (+ (hash-ref nctx 'base) 1))))))
 
 (define (call-to-ir code ctx)
-  (match-let ([(list ir emission identifiers nctx)
-               (arguments-to-ir (rest code) '() '() ctx)])
-    (list (cons (list "=" 
-                      (hash-ref nctx 'base)
-                      (append (list "call" (first code)) (reverse identifiers)))
-                emission)
-          (list "local" (hash-ref nctx 'base))
-          (hash-set nctx 'base (+ (hash-ref nctx 'base) 1)))))
-
+  (let ([function (expression-to-ir (first code) ctx)])
+    (match-let ([(list ir emission identifiers nctx)
+                 (arguments-to-ir (rest code) '() '() (third function))])
+      (list (cons (list "=" 
+                        (hash-ref nctx 'base)
+                        (append (list "call" (second function))
+                                (reverse identifiers)))
+                  (append emission (first function)))
+            (list "local" (hash-ref nctx 'base))
+            (hash-set nctx 'base (+ (hash-ref nctx 'base) 1))))))
+  
 (define (arguments-to-ir code emission identifiers ctx)
   (if (empty? code)
     (list '() emission identifiers ctx)
