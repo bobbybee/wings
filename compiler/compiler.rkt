@@ -44,7 +44,8 @@
   (cond
     [(list? code)
      (case (first code) [(lambda) (lambda-to-ir code
-                                                (hash-set* ctx 'base 0 'locals '())
+                                                (hash-set (hash-set ctx 'base 0)
+                                                          'locals '())
                                                 ctx)]
                         [(define) (define-to-ir code ctx)]
                         [(quote) (quote-to-ir (second code) ctx)]
