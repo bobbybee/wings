@@ -92,7 +92,7 @@
                                                                (hash-ref ctx 'locals))))])
              (list '()
                    (list "lambda" (length (hash-ref ctx 'lambdas))) 
-                   (hash-set octx 'lambdas (cons (cons (second code) ir)
+                   (hash-set octx 'lambdas (cons (cons (second code) (reverse ir))
                                                  (hash-ref nctx 'lambdas))))))
 
 ; May be unstable -- rewrite later
@@ -134,7 +134,8 @@
 
 (define (match-symbol-ir pattern needle ir load? ctx)
   (let ([sanity (expression-to-ir (list 'symbol? needle) ctx)])
-    (list (cons (list "=" pattern needle) (append (first sanity) ir))
+    (list (cons (list "=" (list "local" pattern) needle)
+                (append (first sanity) ir))
           (hash-set (third sanity)
                     'locals
                     (cons pattern (hash-ref (third sanity) 'locals))))))
@@ -160,7 +161,7 @@
             (match-ir (first pattern)
                       (list "local" (hash-ref ctx 'base))
                       (cons (list "="
-                                    (hash-ref ctx 'base)
+                                    (list "local" (hash-ref ctx 'base))
                                     (list "call" "first" needle)) ir)
                       load?
                       (hash-set ctx 'base (+ (hash-ref ctx 'base) 1)))]
@@ -168,7 +169,7 @@
       (match-list-body-ir (rest pattern)
                           (list "local" (hash-ref nctx 'base))
                           (cons (list "="
-                                      (hash-ref nctx 'base) 
+                                      (list "local" (hash-ref nctx 'base))
                                       (list "call" "rest" needle))
                                 (first current-match))
                           load?
@@ -179,7 +180,7 @@
     (match-let ([(list ir emission identifiers nctx)
                  (arguments-to-ir (rest code) '() '() (third function))])
       (list (cons (list "=" 
-                        (hash-ref nctx 'base)
+                        (list "local" (hash-ref nctx 'base))
                         (append (list "call" (second function))
                                 (reverse identifiers)))
                   (append emission (first function)))
@@ -203,9 +204,11 @@
          [pathA (expression-to-ir (third code) (third condition))]
          [pathB (expression-to-ir (fourth code) (third pathA))]
          [nbase (hash-ref (third pathB) 'base)])
-    (list (cons (list "=" nbase (list "if" (second condition)
-                                      (second pathA) (first pathA)
-                                      (second pathB) (first pathB)))
+    (list (cons (list "="
+                      (list "local" nbase)
+                      (list "if" (second condition)
+                                 (second pathA) (first pathA)
+                                 (second pathB) (first pathB)))
                 (first condition))
           nbase
           (hash-set (third pathB) 'base (+ nbase 1)))))
@@ -232,7 +235,7 @@
                                                               'base 0
                                                               'lambdas lambdas))])
         (program-to-ir (rest sexpr)
-                       (cons (first expression) ir) 
+                       (cons (reverse (first expression)) ir) 
                        (hash-ref (third expression) 'globals)
                        (hash-ref (third expression) 'lambdas)))))
 
