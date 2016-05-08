@@ -43,7 +43,9 @@
 (define (expression-to-ir code ctx)
   (cond
     [(list? code)
-     (case (first code) [(lambda) (lambda-to-ir code ctx)]
+     (case (first code) [(lambda) (lambda-to-ir code
+                                                (hash-set* ctx 'base 0 'locals '())
+                                                ctx)]
                         [(define) (define-to-ir code ctx)]
                         [(quote) (quote-to-ir (second code) ctx)]
                         [(let) (let-to-ir code '() ctx)] ; todo: differentiate
@@ -83,14 +85,14 @@
                                                      (second code)
                                                      identifier))))))
 
-(define (lambda-to-ir code ctx)
+(define (lambda-to-ir code ctx octx)
   (match-let ([(list ir identifier nctx)
                (expression-to-ir (third code)
                                  (hash-set ctx 'locals (append (second code)
                                                                (hash-ref ctx 'locals))))])
              (list '()
                    (list "lambda" (length (hash-ref ctx 'lambdas))) 
-                   (hash-set nctx 'lambdas (cons ir (hash-ref nctx 'lambdas))))))
+                   (hash-set octx 'lambdas (cons ir (hash-ref nctx 'lambdas))))))
 
 ; May be unstable -- rewrite later
 (define (quote-to-ir code ctx)
