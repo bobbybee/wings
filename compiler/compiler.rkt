@@ -93,8 +93,13 @@
                                                                (hash-ref ctx 'locals))))])
              (list '()
                    (list "lambda" (length (hash-ref ctx 'lambdas))) 
-                   (hash-set octx 'lambdas (cons (cons (second code) (reverse ir))
-                                                 (hash-ref nctx 'lambdas))))))
+                   (hash-set octx 'lambdas
+                             (cons (cons (second code) 
+                                         (reverse (cons (list "="
+                                                              (list "return")
+                                                              (list "local" (- (hash-ref nctx 'base) 1)))
+                                                        ir)))
+                                   (hash-ref nctx 'lambdas))))))
 
 ; May be unstable -- rewrite later
 (define (quote-to-ir code ctx)
